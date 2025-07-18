@@ -24,10 +24,16 @@ def redrawAll(app):
     drawRect(app.fx, app.fy, app.charWidth, app.charHeight, align='bottom-left', fill='orange')
 
 def onKeyHold(app, keys):
-    if 'left' in keys and app.fx - app.vx >= 0:
-        app.fx -= app.vx
-    if 'right' in keys and app.fx + app.vx + app.charWidth <= app.width:
-        app.fx += app.vx
+    if 'left' in keys:
+        if app.fx - app.vx >= 0:
+            app.fx -= app.vx
+        else:
+            app.fx = 0
+    if 'right' in keys:
+        if app.fx + app.vx + app.charWidth <= app.width:
+            app.fx += app.vx
+        else:
+            app.fx = app.width - app.charWidth
 
 def onKeyPress(app, key):
     if key == 'up' and not app.jumping:
