@@ -29,15 +29,26 @@ class Character:
         self.vy += self.ay
         self.y += self.vy
             
-    def move(self,dir):
-        if dir == -1:
-            if self.x - self.vx >= 0:
-                self.x -= self.vx
-            else:
-                self.x = 0
-        if dir == 1:
-            if self.x + self.vx + self.width <= self.appWidth:
-                self.x += self.vx
-            else:
-                self.x = self.appWidth - self.width
-            
+    def move(self,dir,platforms,appWidth):
+        newX = self.x + dir * self.vx
+        newRight = newX + self.width
+        if newX < 0:
+            newX = 0
+            newRight = newX + self.width
+        elif newRight > appWidth:
+            newRight = appWidth
+            newX = newRight - self.width
+        top = self.y - self.height
+        bot = self.y
+        for p in platforms:
+        # correct vertical‑overlap test
+            if top < p.bot and bot > p.top:
+            # Moving right: were we left of the slab and will we cross p.left?
+                if dir > 0 and self.x + self.width <= p.left and newRight > p.left:
+                    newX = p.left - self.width
+                    newRight = newX + self.width
+            # Moving left: were we right of the slab and will we cross p.right?
+                elif dir < 0 and self.x >= p.right and newX < p.right:
+                    newX = p.right
+                    newRight = newX + self.width
+        self.x = newX

@@ -10,8 +10,8 @@ def onAppStart(app):
     w = app.width
     h = app.height
     app.platforms = [
-        Platform(x = w//6,   y = h//1.4, width = w//4,  appWidth = w, appHeight = h),
-        Platform(x = w//2.5, y = h//1.8,   width = w//3,  appWidth = w, appHeight = h),
+        Platform(x = w//6,   y = h//1.2, width = w//4,  appWidth = w, appHeight = h),
+        Platform(x = w//2.5, y = h//1.4,   width = w//3,  appWidth = w, appHeight = h),
     ]
 
 def redrawAll(app):
@@ -58,12 +58,12 @@ def onResize(app):
         
 def onKeyHold(app,keys):
     if 'left' in keys:
-        app.fireboy.move(-1)
+        app.fireboy.move(-1,app.platforms,app.width)
     if 'right' in keys:
-        app.fireboy.move(1)
+        app.fireboy.move(1,app.platforms,app.width)
     if 'a' in keys:
-        app.watergirl.move(-1)
+        app.watergirl.move(-1,app.platforms,app.width)
     if 'd' in keys:
-        app.watergirl.move(1)
+        app.watergirl.move(1,app.platforms,app.width)
     
 runApp()
