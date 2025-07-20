@@ -24,10 +24,20 @@ class Character:
         self.width = self.height//2
         self.ay = newHeight//133
         
-    def step(self):
+    def step(self,platforms):
         self.prevY = self.y
         self.vy += self.ay
-        self.y += self.vy
+        newY = self.y + self.vy
+        newTop = newY - self.height
+        left = self.x
+        right = self.x + self.width
+        if self.vy < 0:
+            for p in platforms:
+                if right > p.left and left < p.right:
+                    if newTop <= p.bot and newY >= p.top:
+                        newY = p.bot + self.height
+                        self.vy = 0
+        self.y = newY
             
     def move(self,dir,platforms,appWidth):
         newX = self.x + dir * self.vx

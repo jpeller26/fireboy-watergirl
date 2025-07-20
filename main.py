@@ -10,7 +10,7 @@ def onAppStart(app):
     w = app.width
     h = app.height
     app.platforms = [
-        Platform(x = w//6,   y = h//1.2, width = w//4,  appWidth = w, appHeight = h),
+        #Platform(x = w//6,   y = h//1.2, width = w//4,  appWidth = w, appHeight = h),
         Platform(x = w//2.5, y = h//1.4,   width = w//3,  appWidth = w, appHeight = h),
     ]
 
@@ -30,7 +30,7 @@ def onKeyPress(app,key):
         
 def onStep(app):
     for char in app.characters:
-        char.step()
+        char.step(app.platforms)
         landOnPlatform(char,app.platforms,app.base)
         
 def landOnPlatform(char, platforms, groundY):
