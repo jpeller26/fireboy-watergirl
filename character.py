@@ -12,6 +12,8 @@ class Character:
         self.base = y
         self.appWidth = appWidth
         self.appHeight = appHeight
+        self.onPlatform = None
+        self.prevY = self.y
     
     def jump(self):
         if not self.jumping:
