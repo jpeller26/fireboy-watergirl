@@ -43,8 +43,7 @@ def landOnPlatform(char, platforms, groundY):
         charLeft, charRight = char.x, char.x + char.width
         for p in platforms:
             if charRight > p.left and charLeft < p.right:
-                crossed = char.prevY <= p.top <= char.y
-                if crossed:
+                if char.prevY <= p.top <= char.y:
                     char.y = p.top
                     char.vy = 0
                     char.jumping = False

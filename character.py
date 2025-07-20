@@ -51,13 +51,10 @@ class Character:
         top = self.y - self.height
         bot = self.y
         for p in platforms:
-        # correct vertical‑overlap test
             if top < p.bot and bot > p.top:
-            # Moving right: were we left of the slab and will we cross p.left?
                 if dir > 0 and self.x + self.width <= p.left and newRight > p.left:
                     newX = p.left - self.width
                     newRight = newX + self.width
-            # Moving left: were we right of the slab and will we cross p.right?
                 elif dir < 0 and self.x >= p.right and newX < p.right:
                     newX = p.right
                     newRight = newX + self.width
