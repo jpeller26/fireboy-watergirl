@@ -25,12 +25,9 @@ class Character:
         self.ay = newHeight//133
         
     def step(self):
+        self.prevY = self.y
         self.vy += self.ay
         self.y += self.vy
-        if self.y >= self.base:
-            self.y = self.base
-            self.vy = 0
-            self.jumping = False
             
     def move(self,dir):
         if dir == -1:
