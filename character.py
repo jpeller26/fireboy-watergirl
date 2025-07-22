@@ -14,6 +14,10 @@ class Character:
         self.appHeight = appHeight
         self.onPlatform = None
         self.prevY = self.y
+        self.left = x
+        self.right = x + self.width
+        self.bot = self.y
+        self.top = self.y - self.height
     
     def jump(self):
         if not self.jumping:
@@ -40,8 +44,16 @@ class Character:
                         newY = p.bot + self.height
                         self.vy = 0
         self.y = newY
+        
+    def pressButton(self,buttons):
+        for b in buttons:
+            if (b.left <= self.right and b.right >= self.left and
+                b.bot <= self.top and b.top <= self.top):
+                b.pressed = True
+        else:
+            b.pressed = False
             
-    def move(self,dir,platforms,appWidth):
+    def move(self,dir,platforms,appWidth,buttons):
         newX = self.x + dir * self.vx
         newRight = newX + self.width
         if newX < 0:
@@ -61,3 +73,4 @@ class Character:
                     newX = p.right
                     newRight = newX + self.width
         self.x = newX
+        pressButton(self,buttons)

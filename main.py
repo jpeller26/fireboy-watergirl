@@ -2,6 +2,7 @@ from cmu_graphics import *
 from Character import Character
 from Platform import Platform
 from MovingPlatform import MovingPlatform
+from Button import Button
 
 def onAppStart(app):
     app.base = app.height - 50
@@ -10,10 +11,14 @@ def onAppStart(app):
     app.characters = [app.fireboy,app.watergirl]
     w = app.width
     h = app.height
+    mp = MovingPlatform(w//2.5-50,h//1.2,app.width,app.height,w//2.5-10,h//1.6)
     app.platforms = [
         Platform(x = w//2.5,   y = h//1.2, width = w//4,  appWidth = w, appHeight = h),
         Platform(x = w//2.5, y = h//1.6,   width = w//3,  appWidth = w, appHeight = h),
-        MovingPlatform(w//2.5-50,h//1.2,app.width,app.height,w//2.5-10,h//1.6)
+        mp
+    ]
+    app.buttons = [
+        Button(mp,'before',w//2,app.width,app.height)
     ]
 
 def redrawAll(app):
@@ -27,6 +32,8 @@ def redrawAll(app):
                  fill='brown', align='top-left')
     for char in app.characters:
         drawRect(char.x,char.y,char.width,char.height,fill=char.color,align = 'bottom-left')
+    for b in app.buttons:
+        drawRect(b.x,b.y,b.width,b.height,align = 'bottom-left')
 
 def onKeyPress(app,key):
     if key == 'up' and not app.fireboy.jumping:
@@ -70,12 +77,12 @@ def onResize(app):
         
 def onKeyHold(app,keys):
     if 'left' in keys:
-        app.fireboy.move(-1,app.platforms,app.width)
+        app.fireboy.move(-1,app.platforms,app.width,app.buttons)
     if 'right' in keys:
-        app.fireboy.move(1,app.platforms,app.width)
+        app.fireboy.move(1,app.platforms,app.width,app.buttons)
     if 'a' in keys:
-        app.watergirl.move(-1,app.platforms,app.width)
+        app.watergirl.move(-1,app.platforms,app.width,app.buttons)
     if 'd' in keys:
-        app.watergirl.move(1,app.platforms,app.width)
+        app.watergirl.move(1,app.platforms,app.width,app.buttons)
     
 runApp()
