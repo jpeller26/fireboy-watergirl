@@ -13,6 +13,7 @@ class MovingPlatform(Platform):
         self.on = False
         
     def step(self):
+        self.prevTop = self.top
         if self.on:
         # Move up if not yet at endY
             if self.top > self.endY:
