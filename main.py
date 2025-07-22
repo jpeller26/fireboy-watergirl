@@ -12,8 +12,8 @@ def onAppStart(app):
     h = app.height
     app.platforms = [
         Platform(x = w//2.5,   y = h//1.2, width = w//4,  appWidth = w, appHeight = h),
-        Platform(x = w//2.5, y = h//1.4,   width = w//3,  appWidth = w, appHeight = h),
-        MovingPlatform(w//2.5-50,h//1.4,app.width,app.height,w//2.5-10,h//1.2)
+        Platform(x = w//2.5, y = h//1.6,   width = w//3,  appWidth = w, appHeight = h),
+        MovingPlatform(w//2.5-50,h//1.2,app.width,app.height,w//2.5-10,h//1.6)
     ]
 
 def redrawAll(app):
