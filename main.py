@@ -4,11 +4,13 @@ from Platform import Platform
 from MovingPlatform import MovingPlatform
 from Button import Button
 from Lever import Lever
+from Diamond import Diamond
 
 def onAppStart(app):
     app.width = 800
     app.height = 800
     app.base = app.height - 50
+    app.score = 0
     app.fireboy = Character(app.width//80,app.base,'orange',app.width,app.height)
     app.watergirl = Character(app.width//80-10,app.base,'lightBlue',app.width,app.height)
     app.characters = [app.fireboy,app.watergirl]
@@ -22,6 +24,7 @@ def onAppStart(app):
     ]
     app.buttons = []
     app.levers = [Lever(mp,w//2,h//1.2,1,app.width,app.height)]
+    app.diamonds = [Diamond(app.fireboy,w//1.8,h//1.3,app.width,app.height)]
 
 def redrawAll(app):
     drawImage('Images/background.png',0,0)
@@ -30,6 +33,9 @@ def redrawAll(app):
         drawRect(b.x,b.movedBot,b.width,b.height,align = 'bottom')
     for l in app.levers:
         drawRect(l.x,l.y,l.width,l.height,rotateAngle=30*l.dir,align = 'center')
+    for d in app.diamonds:
+        if not d.collected:
+            drawRegularPolygon(d.x,d.y,app.width//50,3,fill=d.color,rotateAngle=60)
     drawRect(0, app.base, app.width, app.height-app.base, fill='darkGray')
     for p in app.platforms:
         if type(p) == Platform:
@@ -69,12 +75,12 @@ def onResize(app):
         
 def onKeyHold(app,keys):
     if 'left' in keys:
-        app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers)
+        app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
     if 'right' in keys:
-        app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers)
+        app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
     if 'a' in keys:
-        app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers)
+        app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
     if 'd' in keys:
-        app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers)
+        app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
     
 runApp(800,800)

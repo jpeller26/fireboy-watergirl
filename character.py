@@ -87,6 +87,14 @@ class Character:
                     l.turnOn()
                 elif dir == l.startDir:
                     l.turnOff()
+                    
+    def collectDiamond(self,diamonds):
+        for d in diamonds:
+            if (self.right > d.left and self.left < d.right and
+                self.bot >= d.top and self.top <= d.bot):
+                if self.color == d.color or d.color == 'both':
+                    d.collected = True
+                    
                 
     def updateBounds(self):
         self.left = self.x
@@ -95,7 +103,7 @@ class Character:
         self.top = self.y - self.height
 
             
-    def move(self,dir,platforms,appWidth,buttons,levers):
+    def move(self,dir,platforms,appWidth,buttons,levers,diamonds):
         newX = self.x + dir * self.vx
         newRight = newX + self.width
         if newX < 0:
@@ -118,3 +126,4 @@ class Character:
         self.updateBounds()
         self.pressButton(buttons)
         self.moveLever(levers,dir)
+        self.collectDiamond(diamonds)
