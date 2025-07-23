@@ -84,10 +84,8 @@ class Character:
             if (self.right > l.left and self.left < l.right and
                 self.bot >= l.top and self.top <= l.bot):
                 if dir == l.startDir*-1:
-                    print(f'dir: {dir}')
                     l.turnOn()
                 elif dir == l.startDir:
-                    print(f'dir: {dir}')
                     l.turnOff()
                 
     def updateBounds(self):
