@@ -8,10 +8,18 @@ class Button:
         self.x = x
         self.height = appHeight//40
         self.width = appWidth//20
-        self.right = x
-        self.left = x + self.width
+        self.left = x
+        self.right = x + self.width
         self.bot = self.y
         self.top = self.bot - self.height
         self.pressed = False
-        if self.pressed: movingPlatform.on = True
-        else: movingPlatform.on = False
+        
+    def press(self):
+        print('button was pressed')
+        self.pressed = True
+        self.movingPlatform.on = True
+       
+    def unPress(self):
+        print('off')
+        self.pressed = False
+        self.movingPlatform.on = False

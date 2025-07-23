@@ -44,14 +44,22 @@ class Character:
                         newY = p.bot + self.height
                         self.vy = 0
         self.y = newY
+        self.updateBounds()
         
-    def pressButton(self,buttons):
+    def pressButton(self, buttons):
         for b in buttons:
-            if (b.left <= self.right and b.right >= self.left and
-                b.bot <= self.top and b.top <= self.top):
-                b.pressed = True
-        else:
-            b.pressed = False
+            if (self.right > b.left and self.left < b.right and
+                self.bot >= b.top and self.top <= b.bot):
+                b.press()
+                return True
+        return False
+                
+    def updateBounds(self):
+        self.left = self.x
+        self.right = self.x + self.width
+        self.bot = self.y
+        self.top = self.y - self.height
+
             
     def move(self,dir,platforms,appWidth,buttons):
         newX = self.x + dir * self.vx
@@ -73,4 +81,5 @@ class Character:
                     newX = p.right
                     newRight = newX + self.width
         self.x = newX
-        pressButton(self,buttons)
+        self.updateBounds()
+        self.pressButton(buttons)

@@ -18,7 +18,8 @@ def onAppStart(app):
         mp
     ]
     app.buttons = [
-        Button(mp,'before',w//2,app.width,app.height)
+        Button(mp,'before',w//2,app.width,app.height),
+        Button(mp,'end',w//2,app.width,app.height)
     ]
 
 def redrawAll(app):
@@ -45,15 +46,22 @@ def onStep(app):
     for p in app.platforms:
         if type(p) == MovingPlatform:
             p.step()
+    buttonPressed = False
     for char in app.characters:
         char.step(app.platforms)
         landOnPlatform(char,app.platforms,app.base)
+        if char.pressButton(app.buttons):
+            buttonPressed = True
+    if buttonPressed == False:
+        for b in app.buttons:
+            b.unPress()
         
 def landOnPlatform(char, platforms, groundY):
     if char.y >= groundY:
         char.y = groundY
         char.vy = 0
         char.jumping = False
+        char.updateBounds()
         return
     charLeft, charRight = char.x, char.x + char.width
     for p in platforms:
@@ -62,11 +70,13 @@ def landOnPlatform(char, platforms, groundY):
                 char.y = p.top
                 char.vy = 0
                 char.jumping = False
+                char.updateBounds()
                 break
             elif char.prevY <= p.top <= char.y:
                 char.y = p.top
                 char.vy = 0
                 char.jumping = False
+                char.updateBounds()
                 break
             
 def onResize(app):
