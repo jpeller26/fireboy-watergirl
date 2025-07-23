@@ -3,8 +3,11 @@ from Character import Character
 from Platform import Platform
 from MovingPlatform import MovingPlatform
 from Button import Button
+from Lever import Lever
 
 def onAppStart(app):
+    app.width = 800
+    app.height = 800
     app.base = app.height - 50
     app.fireboy = Character(app.width//80,app.base,'orange',app.width,app.height)
     app.watergirl = Character(app.width//80-10,app.base,'lightBlue',app.width,app.height)
@@ -18,13 +21,15 @@ def onAppStart(app):
         mp
     ]
     app.buttons = []
-    app.levers = []
+    app.levers = [Lever(mp,w//2,h//1.2,1,app.width,app.height)]
 
 def redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
     for b in app.buttons:
-        drawRect(b.x,b.movedBot,b.width,b.height,align = 'bottom-left')
+        drawRect(b.x,b.movedBot,b.width,b.height,align = 'bottom')
+    for l in app.levers:
+        drawRect(l.x,l.y,l.width,l.height,rotateAngle=30*l.dir,align = 'center')
     drawRect(0, app.base, app.width, app.height-app.base, fill='darkGray')
     for p in app.platforms:
         if type(p) == Platform:
@@ -64,12 +69,12 @@ def onResize(app):
         
 def onKeyHold(app,keys):
     if 'left' in keys:
-        app.fireboy.move(-1,app.platforms,app.width,app.buttons)
+        app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers)
     if 'right' in keys:
-        app.fireboy.move(1,app.platforms,app.width,app.buttons)
+        app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers)
     if 'a' in keys:
-        app.watergirl.move(-1,app.platforms,app.width,app.buttons)
+        app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers)
     if 'd' in keys:
-        app.watergirl.move(1,app.platforms,app.width,app.buttons)
+        app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers)
     
 runApp(800,800)

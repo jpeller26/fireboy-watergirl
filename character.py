@@ -78,6 +78,17 @@ class Character:
                 b.press()
                 return True
         return False
+    
+    def moveLever(self,levers,dir):
+        for l in levers:
+            if (self.right > l.left and self.left < l.right and
+                self.bot >= l.top and self.top <= l.bot):
+                if dir == l.startDir*-1:
+                    print(f'dir: {dir}')
+                    l.turnOn()
+                elif dir == l.startDir:
+                    print(f'dir: {dir}')
+                    l.turnOff()
                 
     def updateBounds(self):
         self.left = self.x
@@ -86,7 +97,7 @@ class Character:
         self.top = self.y - self.height
 
             
-    def move(self,dir,platforms,appWidth,buttons):
+    def move(self,dir,platforms,appWidth,buttons,levers):
         newX = self.x + dir * self.vx
         newRight = newX + self.width
         if newX < 0:
@@ -108,3 +119,4 @@ class Character:
         self.x = newX
         self.updateBounds()
         self.pressButton(buttons)
+        self.moveLever(levers,dir)
