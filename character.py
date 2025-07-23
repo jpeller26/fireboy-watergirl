@@ -1,3 +1,4 @@
+from MovingPlatform import MovingPlatform
 class Character:
     def __init__(self, x, y, color,appWidth,appHeight):
         self.x = x
@@ -23,12 +24,36 @@ class Character:
         if not self.jumping:
             self.vy = -(5*self.height//8)
             self.jumping = True
+            
+    def landOnPlatform(self, platforms, groundY):
+        if self.y >= groundY:
+            self.y = groundY
+            self.vy = 0
+            self.jumping = False
+            self.updateBounds()
+            return
+        charLeft, charRight = self.x, self.x + self.width
+        for p in platforms:
+            if charRight > p.left and charLeft < p.right:
+                if type(p) == MovingPlatform and self.prevY <= p.prevTop <= self.y and p.on:
+                    self.y = p.top
+                    self.vy = 0
+                    self.jumping = False
+                    self.updateBounds()
+                    break
+                elif self.prevY <= p.top <= self.y:
+                    self.y = p.top
+                    self.vy = 0
+                    self.jumping = False
+                    self.updateBounds()
+                    break
     
     def resize(self,newHeight,newBase):
         self.base = newBase
         self.height = newHeight//10
         self.width = self.height//2
-        self.ay = newHeight//133
+        self.ay = newHeight//110
+        self.vx = self.appHeight//80
         
     def step(self,platforms):
         self.prevY = self.y

@@ -5,7 +5,6 @@ from MovingPlatform import MovingPlatform
 from Button import Button
 
 def onAppStart(app):
-    #app.background = loadImage('background.png')
     app.base = app.height - 50
     app.fireboy = Character(app.width//80,app.base,'orange',app.width,app.height)
     app.watergirl = Character(app.width//80-10,app.base,'lightBlue',app.width,app.height)
@@ -18,10 +17,8 @@ def onAppStart(app):
         Platform(x = w//2.5, y = h//1.6,   width = w//3,  appWidth = w, appHeight = h),
         mp
     ]
-    app.buttons = [
-        Button(mp,'before',w//2,app.width,app.height),
-        Button(mp,'end',w//2,app.width,app.height)
-    ]
+    app.buttons = []
+    app.levers = []
 
 def redrawAll(app):
     drawImage('Images/background.png',0,0)
@@ -52,35 +49,12 @@ def onStep(app):
     buttonPressed = False
     for char in app.characters:
         char.step(app.platforms)
-        landOnPlatform(char,app.platforms,app.base)
+        char.landOnPlatform(app.platforms,app.base)
         if char.pressButton(app.buttons):
             buttonPressed = True
     if buttonPressed == False:
         for b in app.buttons:
             b.unPress()
-        
-def landOnPlatform(char, platforms, groundY):
-    if char.y >= groundY:
-        char.y = groundY
-        char.vy = 0
-        char.jumping = False
-        char.updateBounds()
-        return
-    charLeft, charRight = char.x, char.x + char.width
-    for p in platforms:
-        if charRight > p.left and charLeft < p.right:
-            if type(p) == MovingPlatform and char.prevY <= p.prevTop <= char.y and p.on:
-                char.y = p.top
-                char.vy = 0
-                char.jumping = False
-                char.updateBounds()
-                break
-            elif char.prevY <= p.top <= char.y:
-                char.y = p.top
-                char.vy = 0
-                char.jumping = False
-                char.updateBounds()
-                break
             
 def onResize(app):
     app.width = app.height
