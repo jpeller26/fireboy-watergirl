@@ -7,7 +7,7 @@ class Character:
         self.width = self.height//2
         self.vx = self.height//8
         self.vy = 0
-        self.ay = appHeight//100
+        self.ay = appHeight//110
         self.jumping = False
         self.base = y
         self.appWidth = appWidth
