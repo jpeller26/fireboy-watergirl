@@ -116,11 +116,9 @@ class Character:
                 self.bot == b.bot and self.top <= b.bot and
                 self.onGround):
                 if dir == 1:
-                    print(dir)
                     b.left = self.right
                     b.right = self.right + b.sl
                 elif dir == -1:
-                    print(dir)
                     b.right = self.left
                     b.left = self.left - b.sl
                 
