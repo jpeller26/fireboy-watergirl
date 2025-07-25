@@ -5,6 +5,7 @@ from MovingPlatform import MovingPlatform
 from Button import Button
 from Lever import Lever
 from Diamond import Diamond
+from Killpart import Killpart
 
 def onAppStart(app):
     app.width = 800
@@ -25,6 +26,8 @@ def onAppStart(app):
     app.buttons = []
     app.levers = [Lever(mp,w//2,h//1.2,1,app.width,app.height)]
     app.diamonds = [Diamond(app.fireboy,w//1.8,h//1.3,app.width,app.height)]
+    app.killParts = [Killpart(w//2,h//1.6,'orange',app.width,app.height),
+                     Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
 
 def redrawAll(app):
     drawImage('Images/background.png',0,0)
@@ -46,26 +49,30 @@ def redrawAll(app):
                  fill='white', align='top-left',opacity=25)
     for char in app.characters:
         drawRect(char.x,char.y,char.width,char.height,fill=char.color,align = 'bottom-left')
+    for k in app.killParts:
+        drawRect(k.x,k.y,k.width,k.height,fill=k.color)
 
 def onKeyPress(app,key):
-    if key == 'up' and not app.fireboy.jumping:
-        app.fireboy.jump()
-    if key == 'w' and not app.watergirl.jumping:
-        app.watergirl.jump()
+    if not checkGameOver(app):
+        if key == 'up' and not app.fireboy.jumping:
+            app.fireboy.jump()
+        if key == 'w' and not app.watergirl.jumping:
+            app.watergirl.jump()
         
 def onStep(app):
-    for p in app.platforms:
-        if type(p) == MovingPlatform:
-            p.step()
-    buttonPressed = False
-    for char in app.characters:
-        char.step(app.platforms)
-        char.landOnPlatform(app.platforms,app.base)
-        if char.pressButton(app.buttons):
-            buttonPressed = True
-    if buttonPressed == False:
-        for b in app.buttons:
-            b.unPress()
+    if not checkGameOver(app):
+        for p in app.platforms:
+            if type(p) == MovingPlatform:
+                p.step()
+        buttonPressed = False
+        for char in app.characters:
+            char.step(app.platforms)
+            char.landOnPlatform(app.platforms,app.base)
+            if char.pressButton(app.buttons):
+                buttonPressed = True
+        if buttonPressed == False:
+            for b in app.buttons:
+                b.unPress()
             
 def onResize(app):
     app.width = app.height
@@ -73,14 +80,22 @@ def onResize(app):
     for char in app.characters:
         char.resize(app.height,app.base)
         
+def checkGameOver(app):
+    for c in app.characters:
+        if c.gameOver:
+            return True
+    else:
+        return False
+        
 def onKeyHold(app,keys):
-    if 'left' in keys:
-        app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
-    if 'right' in keys:
-        app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
-    if 'a' in keys:
-        app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
-    if 'd' in keys:
-        app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds)
+    if not checkGameOver(app):
+        if 'left' in keys:
+            app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
+        if 'right' in keys:
+            app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
+        if 'a' in keys:
+            app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
+        if 'd' in keys:
+            app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
     
 runApp(800,800)

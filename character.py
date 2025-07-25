@@ -19,6 +19,7 @@ class Character:
         self.right = x + self.width
         self.bot = self.y
         self.top = self.y - self.height
+        self.gameOver = False
     
     def jump(self):
         if not self.jumping:
@@ -94,7 +95,13 @@ class Character:
                 self.bot >= d.top and self.top <= d.bot):
                 if self.color == d.color or d.color == 'both':
                     d.collected = True
-                    
+    
+    def hitKillPart(self,killParts):
+        for k in killParts:
+            if (self.right > k.left and self.left < k.right and
+                self.bot >= k.top and self.top <= k.bot):
+                if k.color != self.color:
+                    self.gameOver = True
                 
     def updateBounds(self):
         self.left = self.x
@@ -103,7 +110,7 @@ class Character:
         self.top = self.y - self.height
 
             
-    def move(self,dir,platforms,appWidth,buttons,levers,diamonds):
+    def move(self,dir,platforms,appWidth,buttons,levers,diamonds,killParts):
         newX = self.x + dir * self.vx
         newRight = newX + self.width
         if newX < 0:
@@ -127,3 +134,4 @@ class Character:
         self.pressButton(buttons)
         self.moveLever(levers,dir)
         self.collectDiamond(diamonds)
+        self.hitKillPart(killParts)

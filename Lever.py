@@ -16,11 +16,9 @@ class Lever:
         self.top = self.y - self.height//2
         
     def turnOn(self):
-        print('turning on')
         self.dir = -1*self.startDir
         self.movingPlatform.on = True
         
     def turnOff(self):
-        print('turning off')
         self.dir = self.startDir
         self.movingPlatform.on = False
