@@ -6,6 +6,7 @@ from Button import Button
 from Lever import Lever
 from Diamond import Diamond
 from Killpart import Killpart
+from Box import Box
 
 def onAppStart(app):
     app.width = 800
@@ -28,6 +29,7 @@ def onAppStart(app):
     app.diamonds = [Diamond(app.fireboy,w//1.8,h//1.3,app.width,app.height)]
     app.killParts = [Killpart(w//2,h//1.6,'orange',app.width,app.height),
                      Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
+    app.boxes = [Box(w//4,app.base,h//16)]
 
 def redrawAll(app):
     drawImage('Images/background.png',0,0)
@@ -40,6 +42,8 @@ def redrawAll(app):
         if not d.collected:
             drawRegularPolygon(d.x,d.y,app.width//50,3,fill=d.color,rotateAngle=60)
     drawRect(0, app.base, app.width, app.height-app.base, fill='darkGray')
+    for m in app.boxes:
+        drawRect(m.left,m.y,m.sl,m.sl,align='bottom-left',fill='grey')
     for p in app.platforms:
         if type(p) == Platform:
             drawRect(p.left, p.top, p.right-p.left, p.bot-p.top,
@@ -67,7 +71,7 @@ def onStep(app):
         buttonPressed = False
         for char in app.characters:
             char.step(app.platforms)
-            char.landOnPlatform(app.platforms,app.base)
+            char.landOnPlatform(app.platforms,app.boxes,app.base)
             if char.pressButton(app.buttons):
                 buttonPressed = True
         if buttonPressed == False:
@@ -77,6 +81,7 @@ def onStep(app):
 def onResize(app):
     app.width = app.height
     app.base = app.height - 50
+    app.boxes = [Box(app.width//4,app.base,app.height//16)]
     for char in app.characters:
         char.resize(app.height,app.base)
         
@@ -90,12 +95,16 @@ def checkGameOver(app):
 def onKeyHold(app,keys):
     if not checkGameOver(app):
         if 'left' in keys:
-            app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
+            app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,
+                             app.diamonds,app.killParts,app.boxes)
         if 'right' in keys:
-            app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
+            app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers,
+                             app.diamonds,app.killParts,app.boxes)
         if 'a' in keys:
-            app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
+            app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers,
+                               app.diamonds,app.killParts,app.boxes)
         if 'd' in keys:
-            app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,app.diamonds,app.killParts)
+            app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,
+                               app.diamonds,app.killParts,app.boxes)
     
 runApp(800,800)

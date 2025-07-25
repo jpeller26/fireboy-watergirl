@@ -20,33 +20,40 @@ class Character:
         self.bot = self.y
         self.top = self.y - self.height
         self.gameOver = False
+        self.onGround = True
     
     def jump(self):
         if not self.jumping:
             self.vy = -(5*self.height//8)
             self.jumping = True
+            self.onGround = False
             
-    def landOnPlatform(self, platforms, groundY):
+    def landOnPlatform(self, platforms, boxes, groundY):
         if self.y >= groundY:
             self.y = groundY
             self.vy = 0
             self.jumping = False
             self.updateBounds()
-            return
+            self.onGround = True
+            return 
         charLeft, charRight = self.x, self.x + self.width
-        for p in platforms:
+        surfaces = platforms + boxes
+        onPlatform = False
+        for p in surfaces:
             if charRight > p.left and charLeft < p.right:
                 if type(p) == MovingPlatform and self.prevY <= p.prevTop <= self.y and p.on:
                     self.y = p.top
                     self.vy = 0
                     self.jumping = False
                     self.updateBounds()
+                    self.onGround = True
                     break
                 elif self.prevY <= p.top <= self.y:
                     self.y = p.top
                     self.vy = 0
                     self.jumping = False
                     self.updateBounds()
+                    self.onGround = True
                     break
     
     def resize(self,newHeight,newBase):
@@ -102,6 +109,20 @@ class Character:
                 self.bot >= k.top and self.top <= k.bot):
                 if k.color != self.color:
                     self.gameOver = True
+                    
+    def moveBox(self,dir,boxes):
+        for b in boxes:
+            if (self.right > b.left and self.left < b.right and
+                self.bot == b.bot and self.top <= b.bot and
+                self.onGround):
+                if dir == 1:
+                    print(dir)
+                    b.left = self.right
+                    b.right = self.right + b.sl
+                elif dir == -1:
+                    print(dir)
+                    b.right = self.left
+                    b.left = self.left - b.sl
                 
     def updateBounds(self):
         self.left = self.x
@@ -110,7 +131,7 @@ class Character:
         self.top = self.y - self.height
 
             
-    def move(self,dir,platforms,appWidth,buttons,levers,diamonds,killParts):
+    def move(self,dir,platforms,appWidth,buttons,levers,diamonds,killParts,boxes):
         newX = self.x + dir * self.vx
         newRight = newX + self.width
         if newX < 0:
@@ -135,3 +156,4 @@ class Character:
         self.moveLever(levers,dir)
         self.collectDiamond(diamonds)
         self.hitKillPart(killParts)
+        self.moveBox(dir,boxes)
