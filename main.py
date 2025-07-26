@@ -26,7 +26,7 @@ def onAppStart(app):
     ]
     app.buttons = []
     app.levers = [Lever(mp,w//2,h//1.2,1,app.width,app.height)]
-    app.diamonds = [Diamond(app.fireboy,w//1.8,h//1.3,app.width,app.height)]
+    app.diamonds = [Diamond('orange',w//1.8,h//1.3,app.width,app.height)]
     app.killParts = [Killpart(w//2,h//1.6,'orange',app.width,app.height),
                      Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
     app.boxes = [Box(w//4,app.base,h//16)]
@@ -40,7 +40,7 @@ def redrawAll(app):
         drawRect(l.x,l.y,l.width,l.height,rotateAngle=30*l.dir,align = 'center')
     for d in app.diamonds:
         if not d.collected:
-            drawRegularPolygon(d.x,d.y,app.width//50,3,fill=d.color,rotateAngle=60)
+            drawImage(d.image,d.x,d.y)
     drawRect(0, app.base, app.width, app.height-app.base, fill='darkGray')
     for m in app.boxes:
         drawRect(m.left,m.y,m.sl,m.sl,align='bottom-left',fill='grey')
