@@ -47,12 +47,30 @@ def redrawAll(app):
     for p in app.platforms:
         if type(p) == Platform:
             drawRect(p.left, p.top, p.right-p.left, p.bot-p.top,
-                 fill='white', align='top-left',opacity=25)
+                 fill=rgb(120,100,10), align='top-left',opacity=50)
+            drawRect(p.left, p.top, p.right-p.left, p.bot-p.top,
+                 fill=None, align='top-left',border='black',borderWidth=3)
         else:
             drawRect(p.left, p.top, p.width, p.bot-p.top,
-                 fill='white', align='top-left',opacity=25)
+                 fill='white', align='top-left',opacity=50)
+            drawRect(p.left, p.top, p.width, p.bot-p.top,
+                 fill=None, align='top-left',border='black',borderWidth=3)
     for char in app.characters:
-        drawRect(char.x,char.y,char.width,char.height,fill=char.color,align = 'bottom-left')
+        if char.vy < 0:
+            head = char.headSprites['jump'][char.frame % len(char.headSprites['jump'])]
+            legs = char.legSprites['idle'][0]
+        elif char.vy > 0 and not char.onGround:
+            head = char.headSprites['fall'][char.frame % len(char.headSprites['fall'])]
+            legs = char.legSprites['idle'][0]
+        elif char.vx != 0 and char.onGround:
+            direction = 'runRight' if char.facing == 'Right' else 'runLeft'
+            head = char.headSprites[direction][char.frame % len(char.headSprites[direction])]
+            legs = char.legSprites[direction][char.frame % len(char.legSprites[direction])]
+        else:
+            head = char.headSprites['idle'][0]
+            legs = char.legSprites['idle'][0]
+        drawImage(legs, char.x, char.y - char.height + 10, align='top-left')
+        drawImage(head, char.x, char.y - char.height, align='top-left')
     for k in app.killParts:
         drawRect(k.x,k.y,k.width,k.height,fill=k.color)
 
@@ -64,6 +82,8 @@ def onKeyPress(app,key):
             app.watergirl.jump()
         
 def onStep(app):
+    for char in app.characters:
+        char.facing = 'none'
     if not checkGameOver(app):
         for p in app.platforms:
             if type(p) == MovingPlatform:

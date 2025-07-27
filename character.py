@@ -1,4 +1,8 @@
+#Sprites from the spriter's resource (this goes for all my sprites):
+#https://www.spriters-resource.com/browser_games/fireboyandwatergirltheforesttemple/sheet/217382/
+
 from MovingPlatform import MovingPlatform
+from cmu_graphics import *
 class Character:
     def __init__(self, x, y, color,appWidth,appHeight):
         self.x = x
@@ -21,6 +25,34 @@ class Character:
         self.top = self.y - self.height
         self.gameOver = False
         self.onGround = True
+        if color == 'orange':
+            self.name = 'fire'
+        if color == 'lightBlue':
+            self.name = 'water'
+        self.headSprites = self.loadHeadSprites(self.name)
+        self.legSprites = self.loadLegSprites(self.name)
+        self.frame = 0
+        self.aCounter = 0
+        self.facing = 'none'
+        self.dir = 0
+        
+    def loadHeadSprites(self, name):
+        base = 'Images/sprites/'
+        return {
+            'runLeft': [f'{base}{name}RunningHeadLeft/{name}Running{i}.png' for i in range(1, 12)],
+            'runRight':[f'{base}{name}RunningHeadRight/{name}Running{i}.png' for i in range(1,12)],
+            'jump':    [f'{base}{name}JumpingHead/{name}Jumping{i}.png' for i in range(1, 6)],
+            'fall':    [f'{base}{name}FallingHead/{name}Falling{i}.png' for i in range(1, 6)],
+            'idle':    [f'{base}{name}StandingStillHead/still{name}{i}.png' for i in range(1,20)]
+        }
+        
+    def loadLegSprites(self,name):
+        base = 'Images/sprites/'
+        return {
+            'runLeft': [f'{base}{name}RunningLegsLeft/{name}Legs{i}.png' for i in range(1, 9)],
+            'runRight': [f'{base}{name}RunningLegsRight/{name}Legs{i}.png' for i in range(1, 9)],
+            'idle': [f'{base}{name}StandingStill.png']
+        }
     
     def jump(self):
         if not self.jumping:
@@ -38,7 +70,6 @@ class Character:
             return 
         charLeft, charRight = self.x, self.x + self.width
         surfaces = platforms + boxes
-        onPlatform = False
         for p in surfaces:
             if charRight > p.left and charLeft < p.right:
                 if type(p) == MovingPlatform and self.prevY <= p.prevTop <= self.y and p.on:
@@ -130,6 +161,7 @@ class Character:
 
             
     def move(self,dir,platforms,appWidth,buttons,levers,diamonds,killParts,boxes):
+        self.dir = dir
         newX = self.x + dir * self.vx
         newRight = newX + self.width
         if newX < 0:
@@ -148,6 +180,13 @@ class Character:
                 elif dir < 0 and self.x >= p.right and newX < p.right:
                     newX = p.right
                     newRight = newX + self.width
+        if dir != 0:
+            self.facing = 'Right' if dir > 0 else 'Left'
+            if self.onGround:
+                self.aCounter = (self.aCounter + 1) % 4
+                if self.aCounter == 0:
+                    self.frame = (self.frame + 1) % len(self.headSprites[f'run{self.facing}'])
+
         self.x = newX
         self.updateBounds()
         self.pressButton(buttons)
