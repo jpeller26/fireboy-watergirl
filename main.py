@@ -30,6 +30,7 @@ def onAppStart(app):
     app.killParts = [Killpart(w//2,h//1.6,'orange',app.width,app.height),
                      Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
     app.boxes = [Box(w//4,app.base,h//16)]
+    app.frameCount = 0
 
 def redrawAll(app):
     drawImage('Images/background.png',0,0)
@@ -84,9 +85,12 @@ def onKeyPress(app,key):
             app.watergirl.jump()
         
 def onStep(app):
-    for char in app.characters:
-        char.facing = 'none'
     if not checkGameOver(app):
+        app.frameCount += 1
+        for char in app.characters:
+            char.facing = 'none'
+            if app.frameCount % 3 == 0:
+                char.frame += 1
         for p in app.platforms:
             if type(p) == MovingPlatform:
                 p.step()

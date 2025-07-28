@@ -12,7 +12,7 @@ class Character:
         self.width = self.height//2
         self.vx = self.height//8
         self.vy = 0
-        self.ay = appHeight//110
+        self.ay = appHeight//112
         self.jumping = False
         self.base = y
         self.appWidth = appWidth
@@ -38,12 +38,16 @@ class Character:
         
     def loadHeadSprites(self, name):
         base = 'Images/sprites/'
+        if name == 'fire':
+            end = 20
+        if name == 'water':
+            end = 30
         return {
             'runLeft': [f'{base}{name}RunningHeadLeft/{name}Running{i}.png' for i in range(1, 12)],
             'runRight':[f'{base}{name}RunningHeadRight/{name}Running{i}.png' for i in range(1,12)],
             'jump':    [f'{base}{name}JumpingHead/{name}Jumping{i}.png' for i in range(1, 6)],
             'fall':    [f'{base}{name}FallingHead/{name}Falling{i}.png' for i in range(1, 6)],
-            'idle':    [f'{base}{name}StandingStillHead/still{name}{i}.png' for i in range(1,20)]
+            'idle':    [f'{base}{name}StandingStillHead/still{name}{i}.png' for i in range(1,end)]
         }
         
     def loadLegSprites(self,name):
@@ -91,7 +95,7 @@ class Character:
         self.base = newBase
         self.height = newHeight//10
         self.width = self.height//2
-        self.ay = newHeight//110
+        self.ay = newHeight//112
         self.vx = self.appHeight//80
         
     def step(self,platforms):
