@@ -49,8 +49,8 @@ class Character:
     def loadLegSprites(self,name):
         base = 'Images/sprites/'
         return {
-            'runLeft': [f'{base}{name}RunningLegsLeft/{name}Legs{i}.png' for i in range(1, 9)],
-            'runRight': [f'{base}{name}RunningLegsRight/{name}Legs{i}.png' for i in range(1, 9)],
+            'runLeft': [f'{base}{name}RunningLegsLeft/{name}Legs{i}.png' for i in range(1, 7)],
+            'runRight': [f'{base}{name}RunningLegsRight/{name}Legs{i}.png' for i in range(1, 7)],
             'idle': [f'{base}{name}StandingStill.png']
         }
     

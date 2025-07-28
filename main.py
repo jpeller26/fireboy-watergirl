@@ -56,21 +56,22 @@ def redrawAll(app):
             drawRect(p.left, p.top, p.width, p.bot-p.top,
                  fill=None, align='top-left',border='black',borderWidth=3)
     for char in app.characters:
-        if char.vy < 0:
-            head = char.headSprites['jump'][char.frame % len(char.headSprites['jump'])]
-            legs = char.legSprites['idle'][0]
-        elif char.vy > 0 and not char.onGround:
-            head = char.headSprites['fall'][char.frame % len(char.headSprites['fall'])]
-            legs = char.legSprites['idle'][0]
-        elif char.vx != 0 and char.onGround:
-            direction = 'runRight' if char.facing == 'Right' else 'runLeft'
-            head = char.headSprites[direction][char.frame % len(char.headSprites[direction])]
-            legs = char.legSprites[direction][char.frame % len(char.legSprites[direction])]
-        else:
-            head = char.headSprites['idle'][0]
-            legs = char.legSprites['idle'][0]
-        drawImage(legs, char.x, char.y - char.height + 10, align='top-left')
-        drawImage(head, char.x, char.y - char.height, align='top-left')
+        if char.dir == 0:
+            direction = 'idle'
+            if char.vy < 0:
+                head = char.headSprites['jump'][char.frame % len(char.headSprites['jump'])]
+                legs = char.legSprites['idle'][0]
+            elif char.vy > 0 and not char.onGround:
+                head = char.headSprites['fall'][char.frame % len(char.headSprites['fall'])]
+                egs = char.legSprites['idle'][0]
+        elif char.dir == -1:
+            direction = 'runLeft'
+        elif char.dir == 1:
+            direction = 'runRight'
+        head = char.headSprites[direction][char.frame % len(char.headSprites[direction])]
+        legs = char.legSprites[direction][char.frame % len(char.legSprites[direction])]
+        drawImage(legs, char.x + char.width//2, char.y - char.height//4.3, align='center')
+        drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.7, align='center')
     for k in app.killParts:
         drawRect(k.x,k.y,k.width,k.height,fill=k.color)
 
@@ -126,5 +127,11 @@ def onKeyHold(app,keys):
         if 'd' in keys:
             app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,
                                app.diamonds,app.killParts,app.boxes)
+            
+def onKeyRelease(app,key):
+    if key == 'left' or key == 'right':
+        app.fireboy.dir = 0
+    if key == 'a' or key == 'd':
+        app.watergirl.dir = 0
     
 runApp(800,800)
