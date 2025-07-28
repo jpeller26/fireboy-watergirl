@@ -57,19 +57,20 @@ def redrawAll(app):
                  fill=None, align='top-left',border='black',borderWidth=3)
     for char in app.characters:
         if char.dir == 0:
-            direction = 'idle'
+            legs = char.legSprites['idle'][0]
             if char.vy < 0:
                 head = char.headSprites['jump'][char.frame % len(char.headSprites['jump'])]
-                legs = char.legSprites['idle'][0]
             elif char.vy > 0 and not char.onGround:
                 head = char.headSprites['fall'][char.frame % len(char.headSprites['fall'])]
-                egs = char.legSprites['idle'][0]
-        elif char.dir == -1:
-            direction = 'runLeft'
-        elif char.dir == 1:
-            direction = 'runRight'
-        head = char.headSprites[direction][char.frame % len(char.headSprites[direction])]
-        legs = char.legSprites[direction][char.frame % len(char.legSprites[direction])]
+            else:
+                head = char.headSprites['idle'][char.frame % len(char.headSprites['idle'])]
+        else:
+            if char.dir == -1:
+                direction = 'runLeft'
+            if char.dir == 1:
+                direction = 'runRight'
+            head = char.headSprites[direction][char.frame % len(char.headSprites[direction])]
+            legs = char.legSprites[direction][char.frame % len(char.legSprites[direction])]
         drawImage(legs, char.x + char.width//2, char.y - char.height//4.3, align='center')
         drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.7, align='center')
     for k in app.killParts:
