@@ -15,4 +15,4 @@ class Diamond:
         elif self.color == 'orange':
             self.image = 'Images/sprites/redDiamond.png'
         elif self.color == 'both':
-            self.image = 'Images/sprites/sprite_127.png'
+            self.image = 'Images/sprites/bothDiamond.png'

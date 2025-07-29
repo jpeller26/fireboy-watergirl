@@ -41,7 +41,7 @@ def redrawAll(app):
         drawRect(l.x,l.y,l.width,l.height,rotateAngle=30*l.dir,align = 'center')
     for d in app.diamonds:
         if not d.collected:
-            drawImage(d.image,d.x,d.y)
+            drawImage(d.image,d.x,d.y,align='center')
     drawRect(0, app.base, app.width, app.height-app.base, fill='darkGray')
     for m in app.boxes:
         drawRect(m.left,m.y,m.sl,m.sl,align='bottom-left',fill='grey')
@@ -65,6 +65,8 @@ def redrawAll(app):
                 head = char.headSprites['fall'][char.frame % len(char.headSprites['fall'])]
             else:
                 head = char.headSprites['idle'][char.frame % len(char.headSprites['idle'])]
+            drawImage(legs, char.x + char.width//2, char.y - char.height//4.3, align='center')
+            drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.2, align='center')
         else:
             if char.dir == -1:
                 direction = 'runLeft'
@@ -72,8 +74,8 @@ def redrawAll(app):
                 direction = 'runRight'
             head = char.headSprites[direction][char.frame % len(char.headSprites[direction])]
             legs = char.legSprites[direction][char.frame % len(char.legSprites[direction])]
-        drawImage(legs, char.x + char.width//2, char.y - char.height//4.3, align='center')
-        drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.7, align='center')
+            drawImage(legs, char.x + char.width//2, char.y - char.height//4.3, align='center')
+            drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.7, align='center')
     for k in app.killParts:
         drawRect(k.x,k.y,k.width,k.height,fill=k.color)
 
