@@ -155,6 +155,15 @@ class Character:
                 elif dir == -1:
                     b.right = self.left
                     b.left = self.left - b.sl
+                    
+    def enterDoor(self,doors):
+        for d in doors:
+            if (self.right > d.left and self.left < d.right and
+                self.bot >= d.top and self.top <= d.bot and d.char == self):
+                d.charInFront = True
+            else:
+                d.charInFront = False
+            
                 
     def updateBounds(self):
         self.left = self.x
@@ -163,7 +172,7 @@ class Character:
         self.top = self.y - self.height
 
             
-    def move(self,dir,platforms,appWidth,buttons,levers,diamonds,killParts,boxes):
+    def move(self,dir,platforms,appWidth,buttons,levers,diamonds,killParts,boxes,doors):
         self.dir = dir
         newX = self.x + dir * self.vx
         newRight = newX + self.width
@@ -193,3 +202,4 @@ class Character:
         self.collectDiamond(diamonds)
         self.hitKillPart(killParts)
         self.moveBox(dir,boxes)
+        self.enterDoor(doors)

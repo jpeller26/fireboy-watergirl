@@ -7,6 +7,7 @@ from Lever import Lever
 from Diamond import Diamond
 from Killpart import Killpart
 from Box import Box
+from Door import Door
 
 def onAppStart(app):
     app.width = 800
@@ -30,8 +31,10 @@ def onAppStart(app):
     app.killParts = [Killpart(w//2,h//1.6,'orange',app.width,app.height),
                      Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
     app.boxes = [Box(w//4,app.base,h//16)]
+    app.doors = [Door(60,app.base,app.fireboy), Door(app.width-100,app.base,app.watergirl)]
     app.frameCount = 0
     app.gamePaused = False
+    app.level = 1
     
 def resetApp(app):
     app.width = app.height
@@ -39,6 +42,8 @@ def resetApp(app):
     app.boxes = [Box(app.width//4,app.base,app.height//16)]
     for char in app.characters:
         char.resize(app.height,app.base)
+    for door in app.doors:
+        door.resize(app.height,app.base)
         
 def start_onScreenActivate(app):
     resetApp(app)
@@ -75,6 +80,10 @@ def game_redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
     drawImage('Images/menu.png',0,0)
+    drawPolygon(app.width//2 - 165,0,app.width//2 + 165,0,app.width//2 + 108,80,app.width//2 - 108,80,fill=rgb(120,90,30),border='black')
+    drawPolygon(app.width//2 - 150,0,app.width//2 + 150,0,app.width//2 + 100,70,app.width//2 - 100,70,fill='black')
+    for r in app.doors:
+        r.draw()
     for b in app.buttons:
         drawRect(b.x,b.movedBot,b.width,b.height,align = 'bottom')
     for l in app.levers:
@@ -88,7 +97,7 @@ def game_redrawAll(app):
     for p in app.platforms:
         if type(p) == Platform:
             drawRect(p.left, p.top, p.right-p.left, p.bot-p.top,
-                 fill=rgb(120,100,10), align='top-left',opacity=50)
+                 fill=rgb(120,90,30), align='top-left',opacity=50)
             drawRect(p.left, p.top, p.right-p.left, p.bot-p.top,
                  fill=None, align='top-left',border='black',borderWidth=3)
         else:
@@ -118,6 +127,22 @@ def game_redrawAll(app):
             drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.7, align='center')
     for k in app.killParts:
         drawRect(k.x,k.y,k.width,k.height,fill=k.color)
+    if checkGameOver(app):
+        drawRect(app.width//2,app.height//2,app.width-100,app.height-200,fill=gradient('darkGrey','grey',start='bottom'),align='center')
+        drawImage('Images/gameOver.png',app.width//2,app.height//2 - 200,align='center')
+        drawImage('Images/restart.png',app.width//2,app.height//2,align='center')
+        drawImage('Images/otherLevels.png',app.width//2,app.height//2+90,align='center')
+        drawImage('Images/home.png',app.width//2,app.height//2+180,align='center')
+        
+def game_onMousePress(app,mx,my):
+    print('in Game')
+    if (app.width-494)//2 <= mx <= (app.width+494)//2:
+        if (app.height-59)//2 <= my <= (app.height+59)//2:
+            setActiveScreen('game')
+        elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
+            setActiveScreen('levels')
+        elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
+            setActiveScreen('start')
 
 def game_onKeyPress(app,key):
     if not checkGameOver(app):
@@ -160,16 +185,16 @@ def game_onKeyHold(app,keys):
     if not checkGameOver(app):
         if 'left' in keys:
             app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,
-                             app.diamonds,app.killParts,app.boxes)
+                             app.diamonds,app.killParts,app.boxes,app.doors)
         if 'right' in keys:
             app.fireboy.move(1,app.platforms,app.width,app.buttons,app.levers,
-                             app.diamonds,app.killParts,app.boxes)
+                             app.diamonds,app.killParts,app.boxes,app.doors)
         if 'a' in keys:
             app.watergirl.move(-1,app.platforms,app.width,app.buttons,app.levers,
-                               app.diamonds,app.killParts,app.boxes)
+                               app.diamonds,app.killParts,app.boxes,app.doors)
         if 'd' in keys:
             app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,
-                               app.diamonds,app.killParts,app.boxes)
+                               app.diamonds,app.killParts,app.boxes,app.doors)
             
 def game_onKeyRelease(app,key):
     if key == 'left' or key == 'right':
@@ -214,4 +239,4 @@ def levels_redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
     
-runAppWithScreens(initialScreen='menu')
+runAppWithScreens(initialScreen='start')
