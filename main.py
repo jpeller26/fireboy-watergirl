@@ -31,6 +31,7 @@ def onAppStart(app):
                      Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
     app.boxes = [Box(w//4,app.base,h//16)]
     app.frameCount = 0
+    app.gamePaused = False
     
 def resetApp(app):
     app.width = app.height
@@ -39,9 +40,13 @@ def resetApp(app):
     for char in app.characters:
         char.resize(app.height,app.base)
         
+def start_onScreenActivate(app):
+    resetApp(app)
+        
 def start_redrawAll(app):
     drawImage('Images/start.png',-320,0)
     drawImage('Images/title.png',app.width//2,app.height//2 - 100,align='center')
+    drawImage('Images/play.png',app.width//2,app.height//2 + 100,align='center')
     for char in app.characters:
         legs = char.legSprites['idle'][0]
         head = char.headSprites['idle'][char.frame % len(char.headSprites['idle'])]
@@ -51,8 +56,10 @@ def start_redrawAll(app):
 def start_onResize(app):
     resetApp(app)
     
-def start_onKeyPress(app,key):
-    setActiveScreen('game')
+def start_onMousePress(app,mx,my):
+    if ((app.width - 186)//2 <= mx <= (app.width + 186)//2 and
+        (app.height + 120)//2<= my <= (app.height + 280)//2):
+        setActiveScreen('game')
     
 def start_onStep(app):
     app.frameCount += 1
@@ -61,9 +68,13 @@ def start_onStep(app):
         if app.frameCount % 2 == 0:
             char.frame += 1
 
+def game_onScreenActivate(app):
+    resetApp(app)
+
 def game_redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
+    drawImage('Images/menu.png',0,0)
     for b in app.buttons:
         drawRect(b.x,b.movedBot,b.width,b.height,align = 'bottom')
     for l in app.levers:
@@ -165,5 +176,42 @@ def game_onKeyRelease(app,key):
         app.fireboy.dir = 0
     if key == 'a' or key == 'd':
         app.watergirl.dir = 0
+        
+def game_onMousePress(app,mx,my):
+    menuCenter = 40
+    menuRadius = 40
+    if ((mx-menuCenter)**2 + (my-menuCenter)**2)**0.5 <= menuRadius:
+        setActiveScreen('menu')
     
-runAppWithScreens(initialScreen='start')
+def menu_onScreenActivate(app):
+    app.gamePaused = True
+        
+def menu_redrawAll(app):
+    drawImage('Images/background.png',0,0)
+    drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
+    drawRect(app.width//2,app.height//2,app.width-100,app.height-100,fill=gradient('darkGrey','grey',start='bottom'),align='center')
+    drawImage('Images/MenuText.png',app.width//2,app.height//2 - 250,align='center')
+    drawImage('Images/continue.png',app.width//2,app.height//2,align='center')
+    drawImage('Images/restart.png',app.width//2,app.height//2+90,align='center')
+    drawImage('Images/otherLevels.png',app.width//2,app.height//2+180,align='center')
+    drawImage('Images/home.png',app.width//2,app.height//2+270,align='center')
+
+def menu_onMousePress(app,mx,my):
+    if (app.width-494)//2 <= mx <= (app.width+494)//2:
+        if (app.height-59)//2 <= my <= (app.height+59)//2:
+            setActiveScreen('game')
+        elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
+            setActiveScreen('game')
+        elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
+            setActiveScreen('levels')
+        elif (app.height-59)//2 + 270 <= my <= (app.height+59)//2 + 270:
+            setActiveScreen('start')
+            
+def levels_onScreenActivate(app):
+    app.gamePaused = True
+
+def levels_redrawAll(app):
+    drawImage('Images/background.png',0,0)
+    drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
+    
+runAppWithScreens(initialScreen='menu')
