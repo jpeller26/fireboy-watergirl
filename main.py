@@ -91,7 +91,7 @@ def onStep(app):
         app.frameCount += 1
         for char in app.characters:
             char.facing = 'none'
-            if app.frameCount % 3 == 0:
+            if app.frameCount % 2 == 0:
                 char.frame += 1
         for p in app.platforms:
             if type(p) == MovingPlatform:
