@@ -13,8 +13,8 @@ def onAppStart(app):
     app.height = 800
     app.base = app.height - 50
     app.score = 0
-    app.fireboy = Character(app.width//80,app.base,'orange',app.width,app.height)
-    app.watergirl = Character(app.width//80-10,app.base,'lightBlue',app.width,app.height)
+    app.fireboy = Character(60,app.base,'orange',app.width,app.height)
+    app.watergirl = Character(app.width-100,app.base,'lightBlue',app.width,app.height)
     app.characters = [app.fireboy,app.watergirl]
     w = app.width
     h = app.height
@@ -31,8 +31,37 @@ def onAppStart(app):
                      Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
     app.boxes = [Box(w//4,app.base,h//16)]
     app.frameCount = 0
+    
+def resetApp(app):
+    app.width = app.height
+    app.base = app.height - 50
+    app.boxes = [Box(app.width//4,app.base,app.height//16)]
+    for char in app.characters:
+        char.resize(app.height,app.base)
+        
+def start_redrawAll(app):
+    drawImage('Images/start.png',-320,0)
+    drawImage('Images/title.png',app.width//2,app.height//2 - 100,align='center')
+    for char in app.characters:
+        legs = char.legSprites['idle'][0]
+        head = char.headSprites['idle'][char.frame % len(char.headSprites['idle'])]
+        drawImage(legs, char.x + char.width//2, char.y - char.height//4.3, align='center')
+        drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.2, align='center')
+        
+def start_onResize(app):
+    resetApp(app)
+    
+def start_onKeyPress(app,key):
+    setActiveScreen('game')
+    
+def start_onStep(app):
+    app.frameCount += 1
+    for char in app.characters:
+        char.facing = 'none'
+        if app.frameCount % 2 == 0:
+            char.frame += 1
 
-def redrawAll(app):
+def game_redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
     for b in app.buttons:
@@ -79,14 +108,14 @@ def redrawAll(app):
     for k in app.killParts:
         drawRect(k.x,k.y,k.width,k.height,fill=k.color)
 
-def onKeyPress(app,key):
+def game_onKeyPress(app,key):
     if not checkGameOver(app):
         if key == 'up' and not app.fireboy.jumping:
             app.fireboy.jump()
         if key == 'w' and not app.watergirl.jumping:
             app.watergirl.jump()
         
-def onStep(app):
+def game_onStep(app):
     if not checkGameOver(app):
         app.frameCount += 1
         for char in app.characters:
@@ -106,12 +135,8 @@ def onStep(app):
             for b in app.buttons:
                 b.unPress()
             
-def onResize(app):
-    app.width = app.height
-    app.base = app.height - 50
-    app.boxes = [Box(app.width//4,app.base,app.height//16)]
-    for char in app.characters:
-        char.resize(app.height,app.base)
+def game_onResize(app):
+    resetApp(app)
         
 def checkGameOver(app):
     for c in app.characters:
@@ -120,7 +145,7 @@ def checkGameOver(app):
     else:
         return False
         
-def onKeyHold(app,keys):
+def game_onKeyHold(app,keys):
     if not checkGameOver(app):
         if 'left' in keys:
             app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,
@@ -135,10 +160,10 @@ def onKeyHold(app,keys):
             app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,
                                app.diamonds,app.killParts,app.boxes)
             
-def onKeyRelease(app,key):
+def game_onKeyRelease(app,key):
     if key == 'left' or key == 'right':
         app.fireboy.dir = 0
     if key == 'a' or key == 'd':
         app.watergirl.dir = 0
     
-runApp(800,800)
+runAppWithScreens(initialScreen='start')
