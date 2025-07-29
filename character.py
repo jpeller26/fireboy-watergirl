@@ -12,7 +12,7 @@ class Character:
         self.width = self.height//2
         self.vx = self.height//8
         self.vy = 0
-        self.ay = appHeight//112
+        self.ay = appHeight//110
         self.jumping = False
         self.base = y
         self.appWidth = appWidth
@@ -32,7 +32,6 @@ class Character:
         self.headSprites = self.loadHeadSprites(self.name)
         self.legSprites = self.loadLegSprites(self.name)
         self.frame = 0
-        self.aCounter = 0
         self.facing = 'none'
         self.dir = 0
         
@@ -95,7 +94,7 @@ class Character:
         self.base = newBase
         self.height = newHeight//10
         self.width = self.height//2
-        self.ay = newHeight//112
+        self.ay = newHeight//110
         self.vx = self.appHeight//80
         
     def step(self,platforms):
@@ -186,10 +185,6 @@ class Character:
                     newRight = newX + self.width
         if dir != 0:
             self.facing = 'Right' if dir > 0 else 'Left'
-            if self.onGround:
-                self.aCounter = (self.aCounter + 1) % 4
-                if self.aCounter == 0:
-                    self.frame = (self.frame + 1) % len(self.headSprites[f'run{self.facing}'])
 
         self.x = newX
         self.updateBounds()
