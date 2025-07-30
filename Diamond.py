@@ -4,13 +4,13 @@ class Diamond:
         self.y = y
         self.appWidth = appWidth
         self.appHeight = appHeight
-        self.right = x + appWidth//50
-        self.left = x - appWidth//50
-        self.top = y - appHeight//50
-        self.bot = y + appHeight//50
+        self.right = x + appWidth//35
+        self.left = x - appWidth//35
+        self.top = y - appHeight//35
+        self.bot = y + appHeight//35
         self.collected = False
         self.color = color
-        if self.color == 'blue':
+        if self.color == 'lightBlue':
             self.image = 'Images/sprites/blueDiamond.png'
         elif self.color == 'orange':
             self.image = 'Images/sprites/redDiamond.png'

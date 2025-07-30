@@ -9,7 +9,7 @@ class Character:
         self.y = y
         self.color = color
         self.height = 40
-        self.width = self.height//2
+        self.width = self.height//3
         self.vx = self.height//8
         self.vy = 0
         self.ay = appHeight//110
@@ -34,6 +34,7 @@ class Character:
         self.frame = 0
         self.facing = 'none'
         self.dir = 0
+        self.score = 0
         
     def loadHeadSprites(self, name):
         base = 'Images/sprites/'
@@ -93,9 +94,13 @@ class Character:
     def resize(self,newHeight,newBase):
         self.base = newBase
         self.height = newHeight//10
-        self.width = self.height//2
+        self.width = self.height//3
         self.ay = newHeight//110
         self.vx = self.appHeight//80
+        self.left = self.x
+        self.right = self.x + self.width
+        self.bot = self.y
+        self.top = self.y - self.height
         
     def step(self,platforms):
         self.prevY = self.y
@@ -132,10 +137,12 @@ class Character:
                     
     def collectDiamond(self,diamonds):
         for d in diamonds:
-            if (self.right > d.left and self.left < d.right and
+            if (not d.collected and 
+                self.right > d.left and self.left < d.right and
                 self.bot >= d.top and self.top <= d.bot):
                 if self.color == d.color or d.color == 'both':
                     d.collected = True
+                    self.score += 1
     
     def hitKillPart(self,killParts):
         for k in killParts:
@@ -158,11 +165,12 @@ class Character:
                     
     def enterDoor(self,doors):
         for d in doors:
-            if (self.right > d.left and self.left < d.right and
-                self.bot >= d.top and self.top <= d.bot and d.char == self):
-                d.charInFront = True
-            else:
-                d.charInFront = False
+            if d.char is self:
+                overlap = (
+                    self.right > d.left and self.left < d.right and
+                    self.bot   >= d.top  and self.top  <= d.bot
+                )
+                d.charInFront = overlap
             
                 
     def updateBounds(self):

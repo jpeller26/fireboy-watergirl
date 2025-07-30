@@ -1,10 +1,7 @@
 class Button:
-    def __init__(self,movingPlatform,loc,x,appWidth,appHeight):
+    def __init__(self,movingPlatform,y,x,appWidth,appHeight):
         self.movingPlatform = movingPlatform
-        if loc == 'before':
-            self.y = movingPlatform.startY
-        else:
-            self.y = movingPlatform.endY
+        self.y = y
         self.x = x
         self.height = appHeight//40
         self.width = appWidth//20

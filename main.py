@@ -13,37 +13,87 @@ def onAppStart(app):
     app.width = 800
     app.height = 800
     app.base = app.height - 50
+    app.frameCount = 0
+    app.level = 'Start'
+    resetApp(app)
+    
+def resetApp(app):
+    w = app.width
+    h = app.height
+    app.gamePaused = False
+    app.levelOver = False
+    brickSpace = h//23.5
     app.score = 0
     app.fireboy = Character(60,app.base,'orange',app.width,app.height)
     app.watergirl = Character(app.width-100,app.base,'lightBlue',app.width,app.height)
+    mp11 = MovingPlatform(0,app.base-15*brickSpace,app.width,app.height,0,app.base-11*brickSpace)
+    mp12 = MovingPlatform(w-w//5-w//9,app.base-16*brickSpace,app.width,app.height,w-w//5-w//9,app.base-20*brickSpace)
+    app.levels = {
+        'levelStart' :
+            {'characters' : [Character(60,app.base,'orange',app.width,app.height),
+                            Character(app.width-100,app.base,'lightBlue',app.width,app.height)],
+             'platforms': [],
+             'buttons' : [],
+             'doors': [],
+             'levers': [],
+             'diamonds': [],
+             'killparts': [],
+             'boxes': []},
+        'level1' :
+            {'characters': [Character(60,app.base,'orange',app.width,app.height),
+                            Character(60,app.base - 4*brickSpace,'lightBlue',app.width,app.height)],
+             'platforms': [Platform(0,app.base - 4*brickSpace,w//3,w,h),
+                            Platform(w-w//6,app.base - 4*brickSpace,w//6,w,h,4*brickSpace),
+                            Platform(w//2.5,app.base - 8*brickSpace,w//3,w,h),
+                            Platform(w//2.5,app.base - 10*brickSpace,w//24,w,h,2*brickSpace),
+                            Platform(w//9,app.base-11*brickSpace,w//3,w,h),
+                            mp11,
+                            Platform(w//9,app.base-15*brickSpace,w-w//9,w,h),
+                            Platform(w-w//5,app.base - 20*brickSpace,w//5,w,h),
+                            mp12],
+             'buttons' : [Button(mp12,app.base-15*brickSpace,w-w//2.8,w,h),
+                          Button(mp12,app.base-20*brickSpace,w-w//10,w,h)],
+             'doors': [Door(w-w//5,app.base - 20*brickSpace,app.fireboy),
+                        Door(w-w//10,app.base - 20*brickSpace,app.watergirl)],
+             'levers': [Lever(mp11,w//7,app.base-11*brickSpace,1,w,h)],
+             'diamonds': [Diamond('orange',6*app.width//11,app.base - 2*brickSpace,w,h),
+                          Diamond('lightBlue',21*app.width//30,app.base - 2*brickSpace,w,h),
+                          Diamond('lightBlue',7*app.width//11,app.base-10*brickSpace,w,h),
+                          Diamond('orange',3*app.width//11,app.base-13*brickSpace,w,h),
+                          Diamond('lightBlue',5*app.width//11,app.base-17*brickSpace,w,h),
+                          Diamond('orange',7*app.width//11,app.base-17*brickSpace,w,h)],
+             'killparts': [Killpart(w//2,app.base,'orange',w,h),
+                           Killpart(2*w//3,app.base,'lightBlue',w,h),
+                           Killpart(w//5,app.base-15*brickSpace,'green',w,h)],
+             'boxes': []},
+            'level2' :{
+                'characters': [Character(60,app.base,'orange',app.width,app.height),
+                                Character(app.width-100,app.base,'lightBlue',app.width,app.height)],
+             'platforms': [Platform(w//2-w//48,app.base-24*brickSpace,)],
+             'buttons' : [],
+             'doors': [],
+             'levers': [],
+             'diamonds': [],
+             'killparts': [],
+             'boxes': []}
+    }
+    app.fireboy.x = app.levels[f'level{app.level}']['characters'][0].x
+    app.fireboy.y = app.levels[f'level{app.level}']['characters'][0].y
+    app.watergirl.x = app.levels[f'level{app.level}']['characters'][1].x
+    app.watergirl.y = app.levels[f'level{app.level}']['characters'][1].y
     app.characters = [app.fireboy,app.watergirl]
-    w = app.width
-    h = app.height
-    mp = MovingPlatform(w//2.5-50,h//1.2,app.width,app.height,w//2.5-10,h//1.6)
-    app.platforms = [
-        Platform(x = w//2.5,   y = h//1.2, width = w//4,  appWidth = w, appHeight = h),
-        Platform(x = w//2.5, y = h//1.6,   width = w//3,  appWidth = w, appHeight = h),
-        mp
-    ]
-    app.buttons = []
-    app.levers = [Lever(mp,w//2,h//1.2,1,app.width,app.height)]
-    app.diamonds = [Diamond('orange',w//1.8,h//1.3,app.width,app.height)]
-    app.killParts = [Killpart(w//2,h//1.6,'orange',app.width,app.height),
-                     Killpart(w//1.7,h//1.6,'lightBlue',app.width,app.height)]
-    app.boxes = [Box(w//4,app.base,h//16)]
-    app.doors = [Door(60,app.base,app.fireboy), Door(app.width-100,app.base,app.watergirl)]
-    app.frameCount = 0
-    app.gamePaused = False
-    app.level = 1
-    
-def resetApp(app):
+    app.platforms = app.levels[f'level{app.level}']['platforms']
+    app.buttons = app.levels[f'level{app.level}']['buttons']
+    app.doors = app.levels[f'level{app.level}']['doors']
+    app.levers = app.levels[f'level{app.level}']['levers']
+    app.diamonds = app.levels[f'level{app.level}']['diamonds']
+    app.killParts = app.levels[f'level{app.level}']['killparts']
+    app.boxes = app.levels[f'level{app.level}']['boxes']
+    app.gameOver = False
     app.width = app.height
     app.base = app.height - 50
-    app.boxes = [Box(app.width//4,app.base,app.height//16)]
     for char in app.characters:
         char.resize(app.height,app.base)
-    for door in app.doors:
-        door.resize(app.height,app.base)
         
 def start_onScreenActivate(app):
     resetApp(app)
@@ -64,6 +114,7 @@ def start_onResize(app):
 def start_onMousePress(app,mx,my):
     if ((app.width - 186)//2 <= mx <= (app.width + 186)//2 and
         (app.height + 120)//2<= my <= (app.height + 280)//2):
+        app.level = 1
         setActiveScreen('game')
     
 def start_onStep(app):
@@ -83,7 +134,11 @@ def game_redrawAll(app):
     drawPolygon(app.width//2 - 165,0,app.width//2 + 165,0,app.width//2 + 108,80,app.width//2 - 108,80,fill=rgb(120,90,30),border='black')
     drawPolygon(app.width//2 - 150,0,app.width//2 + 150,0,app.width//2 + 100,70,app.width//2 - 100,70,fill='black')
     for r in app.doors:
-        r.draw()
+        drawImage(r.stairs,r.x + 10,r.y,align='bottom-left')
+        if not r.charInFront:
+            drawImage(r.door,r.x + 10,r.y,align='bottom-left')
+            drawImage(r.symbol,r.x + 28, r.y - 22,align='bottom-left')
+        drawImage(r.frame,r.x,r.y,align='bottom-left')
     for b in app.buttons:
         drawRect(b.x,b.movedBot,b.width,b.height,align = 'bottom')
     for l in app.levers:
@@ -91,7 +146,8 @@ def game_redrawAll(app):
     for d in app.diamonds:
         if not d.collected:
             drawImage(d.image,d.x,d.y,align='center')
-    drawRect(0, app.base, app.width, app.height-app.base, fill='darkGray')
+    drawRect(0, app.base, app.width, app.height-app.base, 
+             fill=rgb(120,90,30),opacity=50,border='black')
     for m in app.boxes:
         drawRect(m.left,m.y,m.sl,m.sl,align='bottom-left',fill='grey')
     for p in app.platforms:
@@ -133,16 +189,30 @@ def game_redrawAll(app):
         drawImage('Images/restart.png',app.width//2,app.height//2,align='center')
         drawImage('Images/otherLevels.png',app.width//2,app.height//2+90,align='center')
         drawImage('Images/home.png',app.width//2,app.height//2+180,align='center')
+    if app.levelOver:
+        drawRect(app.width//2,app.height//2,app.width-100,app.height-200,fill=gradient('darkGrey','grey',start='bottom'),align='center')
+        drawImage('Images/lvlComplete.png',app.width//2,app.height//2 - 200,align='center')
+        drawImage('Images/nextLevel.png',app.width//2,app.height//2,align='center')
+        drawImage('Images/otherLevels.png',app.width//2,app.height//2+90,align='center')
+        drawImage('Images/home.png',app.width//2,app.height//2+180,align='center')
         
 def game_onMousePress(app,mx,my):
-    print('in Game')
-    if (app.width-494)//2 <= mx <= (app.width+494)//2:
-        if (app.height-59)//2 <= my <= (app.height+59)//2:
-            setActiveScreen('game')
-        elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
-            setActiveScreen('levels')
-        elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
-            setActiveScreen('start')
+    menuCenter = 40
+    menuRadius = 40
+    if ((mx-menuCenter)**2 + (my-menuCenter)**2)**0.5 <= menuRadius:
+        setActiveScreen('menu')
+    if checkGameOver(app) or app.levelOver:
+        if (app.width-494)//2 <= mx <= (app.width+494)//2:
+            if (app.height-59)//2 <= my <= (app.height+59)//2:
+                if checkGameOver(app):
+                    setActiveScreen('game')
+                else:
+                    app.level += 1
+                    resetApp(app)
+            elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
+                setActiveScreen('levels')
+            elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
+                setActiveScreen('start')
 
 def game_onKeyPress(app,key):
     if not checkGameOver(app):
@@ -170,6 +240,14 @@ def game_onStep(app):
         if buttonPressed == False:
             for b in app.buttons:
                 b.unPress()
+        index = 0
+        while index > len(app.diamonds):
+            if app.diamonds[index].collected:
+                app.diamonds.pop(index)
+            else:
+                index += 1
+        app.score = app.fireboy.score + app.watergirl.score
+        checkDoors(app)
             
 def game_onResize(app):
     resetApp(app)
@@ -195,18 +273,18 @@ def game_onKeyHold(app,keys):
         if 'd' in keys:
             app.watergirl.move(1,app.platforms,app.width,app.buttons,app.levers,
                                app.diamonds,app.killParts,app.boxes,app.doors)
+    
+def checkDoors(app):
+    for d in app.doors:
+        if not d.charInFront:
+            return False
+    app.levelOver = True
             
 def game_onKeyRelease(app,key):
     if key == 'left' or key == 'right':
         app.fireboy.dir = 0
     if key == 'a' or key == 'd':
         app.watergirl.dir = 0
-        
-def game_onMousePress(app,mx,my):
-    menuCenter = 40
-    menuRadius = 40
-    if ((mx-menuCenter)**2 + (my-menuCenter)**2)**0.5 <= menuRadius:
-        setActiveScreen('menu')
     
 def menu_onScreenActivate(app):
     app.gamePaused = True

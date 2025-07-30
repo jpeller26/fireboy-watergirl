@@ -14,13 +14,3 @@ class Door:
         self.symbol = f'Images/sprites/doors/{char.name}Symbol.png'
         self.stairs = 'Images/sprites/doors/stairs.png'
         self.charInFront = False
-        
-    def resize(self,newHeight,newBase):
-        self.y = newBase
-    
-    def draw(self):
-        drawImage(self.stairs,self.x + 10,self.y,align='bottom-left')
-        if not self.charInFront:
-            drawImage(self.door,self.x + 10,self.y,align='bottom-left')
-            drawImage(self.symbol,self.x + 28, self.y - 22,align='bottom-left')
-        drawImage(self.frame,self.x,self.y,align='bottom-left')
