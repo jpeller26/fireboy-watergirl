@@ -7,7 +7,7 @@ class MovingPlatform(Platform):
         self.endX = endX
         self.startY = startY
         self.endY = endY
-        self.vy = self.appHeight//400
+        self.vy = self.appHeight//300
         self.width = appWidth//9
         self.right = self.left + self.width
         self.on = False

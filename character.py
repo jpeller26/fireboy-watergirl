@@ -102,7 +102,7 @@ class Character:
         self.bot = self.y
         self.top = self.y - self.height
         
-    def step(self,platforms):
+    def step(self,platforms,diamonds,killParts):
         self.prevY = self.y
         self.vy += self.ay
         newY = self.y + self.vy
@@ -116,6 +116,8 @@ class Character:
                         newY = p.bot + self.height
                         self.vy = 0
         self.y = newY
+        self.collectDiamond(diamonds)
+        self.hitKillPart(killParts)
         self.updateBounds()
         
     def pressButton(self, buttons):
