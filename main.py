@@ -71,7 +71,7 @@ def resetApp(app):
              'killparts': [],
              'boxes': [],
              'score':0},
-        'level1' :
+        'level2' :
             {'characters': [Character(60,app.base,'orange',app.width,app.height),
                             Character(60,app.base - 4*brickSpace,'lightBlue',app.width,app.height)],
              'platforms': [Platform(0,app.base - 4*brickSpace,w//3,w,h),
@@ -99,7 +99,7 @@ def resetApp(app):
                            Killpart(w//5,app.base-15*brickSpace,'green',w,h)],
              'boxes': [],
              'score': 6},
-            'level2' :{
+            'level1' :{
                 'characters': [Character(7*w//32-w//30,app.base,'orange',app.width,app.height),
                                 Character(24*w//32+w//24,app.base,'lightBlue',app.width,app.height)],
              'platforms': [Platform(w//2-w//48,app.base-19*brickSpace,w//24,w,h,19*brickSpace),
@@ -645,4 +645,4 @@ def levels_onMousePress(app,mx,my):
         if 606 <= my <= 666:
             setActiveScreen('howTo')
     
-runAppWithScreens(initialScreen='levels')
+runAppWithScreens(initialScreen='start')
