@@ -277,11 +277,11 @@ def game_redrawAll(app):
             secondDigit = (app.score//10)%10
             drawImage(f'Images/Times/{secondDigit}.png',2*app.width//3-20,315,align='center')
             drawImage(f'Images/Times/{firstDigit}.png',2*app.width//3+20,315,align='center')
-        if checkGameOver:
+        if checkGameOver(app):
             drawImage('Images/gameOver.png',app.width//2,app.height//2 - 215,align='center')
             drawImage('Images/restart.png',app.width//2,app.height//2,align='center')
         if app.levelOver:
-            drawImage('Images/lvlComplete.png',app.width//2,app.height//2 - 200,align='center')
+            drawImage('Images/lvlComplete.png',app.width//2,app.height//2 - 250,align='center')
             drawImage('Images/nextLevel.png',app.width//2,app.height//2,align='center')
         
 def game_onMousePress(app,mx,my):
@@ -319,7 +319,7 @@ def game_onKeyPress(app,key):
             app.watergirl.jump()
         
 def game_onStep(app):
-    if not checkGameOver(app):
+    if not checkGameOver(app) and not app.levelOver:
         app.frameCount += 1
         for char in app.characters:
             char.facing = 'none'
