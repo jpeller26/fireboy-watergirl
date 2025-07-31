@@ -10,14 +10,23 @@ from Box import Box
 from Door import Door
 
 def onAppStart(app):
+    #This makes sure my width,height,and base are where I want them
     app.width = 800
     app.height = 800
     app.base = app.height - 50
+    #I can keep track of which levels the player can acces through this
+    app.completeLvls = {1}
+    #Will index levelStart in the dictionary for drawing fb and wg
     app.level = 'Start'
     app.prevLevel = 1
+    #I need to reset the app a lot, so I made a helper function
     resetApp(app)
 
 def resetApp(app):
+    #The time frames are what I use to draw my timer instead of time.time
+    #This was easier than trying to take the difference, especially given
+    #that I didn't need the time value anywhere. These change with
+    #certain frame rate values to make them change on time correctly.
     app.frameCount = 0
     app.oneSeconds = [f'Images/Times/{i}.png' for i in range(0,10)]
     app.oneFrame = 0
@@ -27,12 +36,17 @@ def resetApp(app):
     app.minFrame = 0
     app.tenMinutes = [f'Images/Times/{i}.png' for i in range(0,10)]
     app.tenMinFrame = 0
+    #abbreviating to make constructors easier
     w = app.width
     h = app.height
+    #this is what I flip to true when characters die or finish the level
     app.gamePaused = False
     app.levelOver = False
+    app.gameOver = False
+    #based on the background, how tall the bricks are
     brickSpace = h//23.5
     app.score = 0
+    #Need my characters and moving platforms for constructors inside the dict
     app.fireboy = Character(60,app.base,'orange',app.width,app.height)
     app.watergirl = Character(app.width-100,app.base,'lightBlue',app.width,app.height)
     mp11 = MovingPlatform(0,app.base-15*brickSpace,app.width,app.height,0,app.base-11*brickSpace)
@@ -41,6 +55,10 @@ def resetApp(app):
     mp22 = MovingPlatform(w-w//9,app.base-brickSpace,w,h,w-w//9,app.base-19*brickSpace)
     mp31 = MovingPlatform(0,app.base-5*brickSpace,w,h,0,app.base-14*brickSpace,w//5)
     mp32 = MovingPlatform(w-w//5,app.base-5*brickSpace,w,h,w-w//5,app.base-14*brickSpace,w//5)
+    mp41 = MovingPlatform(9*w//48,app.base - 11*brickSpace,w,h,5*w//24,app.base-16*brickSpace,w//12)
+    mp42 = MovingPlatform(35*w//48,app.base - 11*brickSpace,w,h,5*w//24,app.base-16*brickSpace,w//12)
+    #Dictionary that contians all my level information, I index into this to draw
+    #each level based on what app.level is
     app.levels = {
         'levelStart' :
             {'characters' : [Character(60,app.base,'orange',app.width,app.height),
@@ -51,7 +69,8 @@ def resetApp(app):
              'levers': [],
              'diamonds': [],
              'killparts': [],
-             'boxes': []},
+             'boxes': [],
+             'score':0},
         'level1' :
             {'characters': [Character(60,app.base,'orange',app.width,app.height),
                             Character(60,app.base - 4*brickSpace,'lightBlue',app.width,app.height)],
@@ -78,7 +97,8 @@ def resetApp(app):
              'killparts': [Killpart(w//2,app.base,'orange',w,h),
                            Killpart(2*w//3,app.base,'lightBlue',w,h),
                            Killpart(w//5,app.base-15*brickSpace,'green',w,h)],
-             'boxes': []},
+             'boxes': [],
+             'score': 6},
             'level2' :{
                 'characters': [Character(7*w//32-w//30,app.base,'orange',app.width,app.height),
                                 Character(24*w//32+w//24,app.base,'lightBlue',app.width,app.height)],
@@ -114,7 +134,8 @@ def resetApp(app):
                           Diamond('lightBlue',w-w//18,app.base-20*brickSpace,w,h)],
              'killparts': [Killpart(7*w//32+w//24,app.base-3*brickSpace,'lightBlue',w,h,w//9),
                            Killpart(24*w//32-w//9,app.base-3*brickSpace,'orange',w,h,w//9)],
-             'boxes': []},
+             'boxes': [],
+             'score': 10},
         'level3' : {'characters' : [Character(20,app.base-17*brickSpace,'orange',app.width,app.height),
                                     Character(app.width-40,app.base-17*brickSpace,'lightBlue',app.width,app.height)],
                     'platforms': [Platform(0,app.base-17*brickSpace,w//8,w,h),
@@ -137,8 +158,37 @@ def resetApp(app):
                                  Diamond('lightBlue',23*w//24,app.base-10*brickSpace,w,h)],
                     'killparts': [Killpart(w//2-w//6,app.base,'green',w,h,w//3)],
                     'boxes': [Box(w//2-w//6-85,app.base),
-                              Box(w//2+w//6+50,app.base)]}
+                              Box(w//2+w//6+50,app.base)],
+                    'score': 6},
+        'level4':   {'characters' : [Character(100,app.base,'orange',app.width,app.height),
+                                    Character(app.width-120,app.base,'lightBlue',app.width,app.height)],
+                    'platforms': [Platform(w//2-w//12,app.base-3*brickSpace,w//6,w,h),
+                                  Platform(0,app.base-16*brickSpace,w//6,w,h),
+                                  Platform(w-w//6,app.base-16*brickSpace,w//6,w,h),
+                                  Platform(w*5//24,app.base-5*brickSpace,w//12,w,h),
+                                  Platform(w*17//24,app.base-5*brickSpace,w//12,w,h),
+                                  Platform(0,app.base - 9*brickSpace+15,w//12,w,h),
+                                  Platform(w-w//12,app.base - 9*brickSpace+15,w//12,w,h),
+                                  mp41,
+                                  mp42],
+                    'buttons' : [Button(mp41,app.base-3*brickSpace,app.width//2,w,h),
+                                 Button(mp42,app.base-16*brickSpace,105,w,h)],
+                    'doors': [Door(w - 76,app.base-16*brickSpace,app.fireboy),
+                              Door(0,app.base-16*brickSpace,app.watergirl)],
+                    'levers': [],
+                    'diamonds': [Diamond('orange',13*w//24,app.base-5*brickSpace,w,h),
+                                 Diamond('lightBlue',11*w//24,app.base-5*brickSpace,w,h),
+                                 Diamond('orange',11*w//24,app.base-11*brickSpace,w,h),
+                                 Diamond('lightBlue',13*w//24,app.base-11*brickSpace,w,h),
+                                 Diamond('both',30,app.base-brickSpace,w,h),
+                                 Diamond('both',w-30,app.base-brickSpace,w,h)],
+                    'killparts': [Killpart(0,app.base,'orange',w,h,w//3),
+                                  Killpart(w//2-w//6,app.base,'green',w,h,w//3),
+                                  Killpart(w-w//3,app.base,'lightBlue',w,h,w//3)],
+                    'boxes': [],
+                    'score': 6}
     }
+    #These are so I can access them easily in other functions
     app.fireboy.x = app.levels[f'level{app.level}']['characters'][0].x
     app.fireboy.y = app.levels[f'level{app.level}']['characters'][0].y
     app.watergirl.x = app.levels[f'level{app.level}']['characters'][1].x
@@ -151,9 +201,13 @@ def resetApp(app):
     app.diamonds = app.levels[f'level{app.level}']['diamonds']
     app.killParts = app.levels[f'level{app.level}']['killparts']
     app.boxes = app.levels[f'level{app.level}']['boxes']
-    app.gameOver = False
+    app.reqScore = app.levels[f'level{app.level}']['score']
+    #Making sure the screen stays square
     app.width = app.height
     app.base = app.height - 50
+    #Because of how I want my sizing, i need to make sure the characters
+    #dimensions and other app dependent measurements change when the
+    #screen is sized up to 800 by 800
     for char in app.characters:
         char.resize(app.height,app.base)
         
@@ -163,10 +217,12 @@ def start_onScreenActivate(app):
     
         
 def start_redrawAll(app):
+    #These are my images that I photoshopped for the title screen
     drawImage('Images/start.png',-320,0)
     drawImage('Images/title.png',app.width//2,app.height//2 - 100,align='center')
     drawImage('Images/play.png',app.width//2,app.height//2 + 100,align='center')
     drawImage('Images/htp.png',app.width//2,app.height//2 + 200,align='center')
+    #Cycle through the character's sprites to make them move based on char.frame
     for char in app.characters:
         legs = char.legSprites['idle'][0]
         head = char.headSprites['idle'][char.frame % len(char.headSprites['idle'])]
@@ -177,14 +233,18 @@ def start_onResize(app):
     resetApp(app)
     
 def start_onMousePress(app,mx,my):
+    #Play button that should take you to the first level
     if ((app.width - 186)//2 <= mx <= (app.width + 186)//2 and
         (app.height + 120)//2<= my <= (app.height + 280)//2):
         app.level = 1
+        resetApp(app)
         setActiveScreen('game')
+    #How to that should take you to the explanation of how to play
     if (236 <= mx <= 536 and 553 <= my <= 619):
         setActiveScreen('howTo')
     
 def start_onStep(app):
+    #Changes app.frameCount and char.frame so the sprites update to create movement
     app.frameCount += 1
     for char in app.characters:
         char.facing = 'none'
@@ -192,13 +252,16 @@ def start_onStep(app):
             char.frame += 1
 
 def game_onScreenActivate(app):
-    resetApp(app)
+    pass
 
 def game_redrawAll(app):
+    #background
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
+    #menu and help buttons
     drawImage('Images/menu.png',0,0)
     drawImage('Images/help.png',app.width-80,0)
+    #drawing the features where their constructors say they should be
     for r in app.doors:
         drawImage(r.stairs,r.x + 10,r.y,align='bottom-left')
         if not r.charInFront:
@@ -227,6 +290,10 @@ def game_redrawAll(app):
                  fill='white', align='top-left',opacity=50)
             drawRect(p.left, p.top, p.width, p.bot-p.top,
                  fill=None, align='top-left',border='black',borderWidth=3)
+    #This is the logic for the character's active sprite folder and active sprite
+    #based on char.dir, the character should be facing in that direction
+    #If the dir is 0, meaning the character isn't moving left or right,
+    #it should be either idle,jumping, or falling depending on the vy of the char
     for char in app.characters:
         if char.dir == 0:
             legs = char.legSprites['idle'][0]
@@ -248,31 +315,40 @@ def game_redrawAll(app):
             drawImage(legs, char.x + char.width//2, char.y - char.height//4.3, align='center')
             drawImage(head, char.x + char.width//2 - 10*char.dir, char.y - 3*char.height//4.7, align='center')
     for k in app.killParts:
+        #I couldn't find sprites for this, so this was the best I could do
         drawRect(k.x,k.y,k.width,k.height,fill=k.color)
     drawPolygon(app.width//2 - 165,0,app.width//2 + 165,0,app.width//2 + 108,80,app.width//2 - 108,80,fill=rgb(120,90,30),border='black')
     drawPolygon(app.width//2 - 150,0,app.width//2 + 150,0,app.width//2 + 100,70,app.width//2 - 100,70,fill='black')
+    #This is my timer logic, mentioned earlier. It cycles through based on the framecount
+    #This displays the time in that level at the top
     if not checkGameOver(app) and not app.levelOver:
         drawImage(app.oneSeconds[app.oneFrame % 10],460,35,align='center')
         drawImage(app.tenSeconds[app.tenFrame % 6],420,35,align='center')
         drawImage('Images/Times/colon.png',app.width//2,35,align='center')
         drawImage(app.oneMinutes[app.minFrame % 10],350,35,align='center')
         drawImage(app.tenMinutes[app.tenMinFrame % 10],310,35,align='center')
+    #this brings up a pop-up, both game over and level complete share a lot of
+    #features so I was able to use that to my advantage
     if checkGameOver(app) or app.levelOver:
         drawRect(app.width//2,app.height//2,app.width-100,app.height-200,fill=gradient('darkGrey','grey',start='bottom'),align='center')
         drawImage('Images/otherLevels.png',app.width//2,app.height//2+90,align='center')
         drawImage('Images/home.png',app.width//2,app.height//2+180,align='center')
+        #Draw how much time you spent
         drawImage('Images/time.png',app.width//3,250,align='center')
         drawImage(app.oneSeconds[app.oneFrame % 10],460+app.width//6,250,align='center')
         drawImage(app.tenSeconds[app.tenFrame % 6],420+app.width//6,250,align='center')
         drawImage('Images/Times/colon.png',app.width//2+app.width//6,250,align='center')
         drawImage(app.oneMinutes[app.minFrame % 10],350+app.width//6,250,align='center')
         drawImage(app.tenMinutes[app.tenMinFrame % 10],310+app.width//6,250,align='center')
+        #draw how many diamonds you collected based on app.score
         drawImage('Images/sprites/blueDiamond.png',app.width//3-40,315,align='center')
         drawImage('Images/sprites/redDiamond.png',app.width//3,315,align='center')
         drawImage('Images/sprites/bothDiamond.png',app.width//3+40,315,align='center')
         if app.score <= 9:
+            #if it's one digit, we only need one of the images
             drawImage(f'Images/Times/{app.score}.png',2*app.width//3,315,align='center')
         elif app.score >= 10:
+            #if it's two, we'll need to pull up two images based on the first and second digit
             firstDigit = app.score%10
             secondDigit = (app.score//10)%10
             drawImage(f'Images/Times/{secondDigit}.png',2*app.width//3-20,315,align='center')
@@ -282,20 +358,29 @@ def game_redrawAll(app):
             drawImage('Images/restart.png',app.width//2,app.height//2,align='center')
         if app.levelOver:
             drawImage('Images/lvlComplete.png',app.width//2,app.height//2 - 250,align='center')
-            drawImage('Images/nextLevel.png',app.width//2,app.height//2,align='center')
+            if app.score == app.reqScore:
+                image = 'Images/nextLevel.png'
+                app.completeLvls.add(app.level+1)
+            else:
+                image = 'Images/restart.png'
+                drawImage('Images/insufficient.png',app.width//2,app.height//2-185,align='center')
+            drawImage(image,app.width//2,app.height//2,align='center')
         
 def game_onMousePress(app,mx,my):
     menuCenter = 40
     radius = 40
     helpCenter = app.width-42
+    #allowing you to click the menu and the how to during the game
     if ((mx-menuCenter)**2 + (my-menuCenter)**2)**0.5 <= radius:
         setActiveScreen('menu')
     if ((mx-helpCenter)**2 + (my-menuCenter)**2)**0.5 <= radius:
         setActiveScreen('howTo')
+    #click the buttons if game over or level complete
     if checkGameOver(app) or app.levelOver:
         if (app.width-494)//2 <= mx <= (app.width+494)//2:
             if (app.height-59)//2 <= my <= (app.height+59)//2:
                 if checkGameOver(app):
+                    resetApp(app)
                     setActiveScreen('game')
                 else:
                     if app.level != len(app.levels) - 1:
@@ -304,6 +389,7 @@ def game_onMousePress(app,mx,my):
                         resetApp(app)
                     else:
                         setActiveScreen('levels')
+            #agin, these both share these buttons, so i only needed to write the logic once
             elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
                 setActiveScreen('levels')
             elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
@@ -312,6 +398,7 @@ def game_onMousePress(app,mx,my):
                 setActiveScreen('start')
 
 def game_onKeyPress(app,key):
+    #jumping logic - more in character class
     if not checkGameOver(app):
         if key == 'up' and app.fireboy.onGround:
             app.fireboy.jump()
@@ -320,14 +407,18 @@ def game_onKeyPress(app,key):
         
 def game_onStep(app):
     if not checkGameOver(app) and not app.levelOver:
+        #update the character's sprites based on app.frameCount
         app.frameCount += 1
         for char in app.characters:
             char.facing = 'none'
             if app.frameCount % 2 == 0:
                 char.frame += 1
+        #move the moving platforms
         for p in app.platforms:
             if type(p) == MovingPlatform:
                 p.step()
+        #logic for standing on the buttons, need to assume the button is not
+        #pressed and then change it if there's a character overlapping
         buttonPressed = False
         for char in app.characters:
             char.step(app.platforms,app.diamonds,app.killParts)
@@ -337,13 +428,16 @@ def game_onStep(app):
         if buttonPressed == False:
             for b in app.buttons:
                 b.unPress()
+        #popping diamonds from app.diamonds if they've been collected
         index = 0
         while index > len(app.diamonds):
             if app.diamonds[index].collected:
                 app.diamonds.pop(index)
             else:
                 index += 1
+        #counting number of diamonds
         app.score = app.fireboy.score + app.watergirl.score
+        #timer frame counts
         checkDoors(app)
         if app.frameCount % 30 == 0:
             app.oneFrame += 1
@@ -358,6 +452,7 @@ def game_onResize(app):
     resetApp(app)
         
 def checkGameOver(app):
+    #Checking if characters died
     for c in app.characters:
         if c.gameOver:
             return True
@@ -366,6 +461,8 @@ def checkGameOver(app):
         
 def game_onKeyHold(app,keys):
     if not checkGameOver(app):
+        #we pass in a direction and all the level objects so that the character
+        #can interact with them inside their own class and not in main
         if 'left' in keys:
             app.fireboy.move(-1,app.platforms,app.width,app.buttons,app.levers,
                              app.diamonds,app.killParts,app.boxes,app.doors)
@@ -380,12 +477,15 @@ def game_onKeyHold(app,keys):
                                app.diamonds,app.killParts,app.boxes,app.doors)
     
 def checkDoors(app):
+    #return false if any of the doors don't have a character in front
+    #if all the doors have a character in front, the level is complete
     for d in app.doors:
         if not d.charInFront:
             return False
     app.levelOver = True
             
 def game_onKeyRelease(app,key):
+    #make sure the direction is set back to 0 if that key isn't being held
     if key == 'left' or key == 'right':
         app.fireboy.dir = 0
     if key == 'a' or key == 'd':
@@ -403,14 +503,34 @@ def menu_redrawAll(app):
     drawImage('Images/restart.png',app.width//2,app.height//2+90,align='center')
     drawImage('Images/otherLevels.png',app.width//2,app.height//2+180,align='center')
     drawImage('Images/home.png',app.width//2,app.height//2+270,align='center')
+    #Show the time you had in the level
+    drawImage('Images/time.png',app.width//3,250,align='center')
+    drawImage(app.oneSeconds[app.oneFrame % 10],460+app.width//6,250,align='center')
+    drawImage(app.tenSeconds[app.tenFrame % 6],420+app.width//6,250,align='center')
+    drawImage('Images/Times/colon.png',app.width//2+app.width//6,250,align='center')
+    drawImage(app.oneMinutes[app.minFrame % 10],350+app.width//6,250,align='center')
+    drawImage(app.tenMinutes[app.tenMinFrame % 10],310+app.width//6,250,align='center')
+    #Show the diamonds you collected in the level
+    drawImage('Images/sprites/blueDiamond.png',app.width//3-40,315,align='center')
+    drawImage('Images/sprites/redDiamond.png',app.width//3,315,align='center')
+    drawImage('Images/sprites/bothDiamond.png',app.width//3+40,315,align='center')
+    if app.score <= 9:
+        drawImage(f'Images/Times/{app.score}.png',2*app.width//3,315,align='center')
+    elif app.score >= 10:
+        firstDigit = app.score%10
+        secondDigit = (app.score//10)%10
+        drawImage(f'Images/Times/{secondDigit}.png',2*app.width//3-20,315,align='center')
+        drawImage(f'Images/Times/{firstDigit}.png',2*app.width//3+20,315,align='center')
 
 def menu_onMousePress(app,mx,my):
+    #button pressing logic within menu
     if (app.width-494)//2 <= mx <= (app.width+494)//2:
         if (app.height-59)//2 <= my <= (app.height+59)//2:
             app.level = app.prevLevel
             setActiveScreen('game')
         elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
             app.level = app.prevLevel
+            resetApp(app)
             setActiveScreen('game')
         elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
             setActiveScreen('levels')
@@ -421,12 +541,14 @@ def howTo_onScreenActivate(app):
     app.gamePaused = True
     
 def howTo_onStep(app):
+    #move character sprite in howTo screen
     app.frameCount += 1
     for char in app.characters:
         if app.frameCount % 2 == 0:
             char.frame += 1
     
 def howTo_redrawAll(app):
+    #My explanations that I used photoshop to write in the font i wanted
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
     drawRect(app.width//2,app.height//2,app.width-100,app.height-100,fill=gradient('darkGrey','grey',start='bottom'),align='center')
@@ -451,10 +573,13 @@ def howTo_redrawAll(app):
     drawImage('Images/home.png',app.width//2,app.height//2 + 290,align='center')
     
 def howTo_onMousePress(app,mx,my):
+    #Button logic
     if (app.width-494)//2 <= mx <= (app.width+494)//2:
         if 572 <= my <= 630:
-            app.level = app.prevLevel
-            setActiveScreen('game')
+            if(app.level) == 'Start':
+                setActiveScreen('start')
+            else:
+                setActiveScreen('game')
         if 647 <= my <= 705:
             setActiveScreen('start')
 
@@ -462,6 +587,7 @@ def levels_onScreenActivate(app):
     app.gamePaused = False
     
 def levels_onStep(app):
+    #Have the sprites move in the level meny
     app.frameCount += 1
     for char in app.characters:
         if app.frameCount % 2 == 0:
@@ -470,16 +596,17 @@ def levels_onStep(app):
 def levels_redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
+    #draw my level boxes and labels
     drawRect(app.width//2,app.height//2,app.width-100,app.height-100,fill=gradient('darkGrey','grey',start='bottom'),align='center')
+    for i in range(4):
+        color = rgb(120,90,30) if i+1 in app.completeLvls else 'dimGray'
+        drawRect(86 + 168*i,app.height//2-175,app.width//8,app.width//8,fill = color,align='top-left')
     drawImage('Images/levels.png',app.width//2,app.height//2 - 260,align='center')
-    drawRect(app.width//2-300,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30))
     drawImage('Images/Times/1.png',app.width//2-250,app.height//2 - 125,align='center')
-    drawRect(app.width//2-132,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30))
     drawImage('Images/Times/2.png',app.width//2-82,app.height//2 - 125,align='center')
-    drawRect(app.width//2+300,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30),align='top-right')
     drawImage('Images/Times/4.png',app.width//2+250,app.height//2 - 125,align='center')
-    drawRect(app.width//2+132,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30),align='top-right')
     drawImage('Images/Times/3.png',app.width//2+82,app.height//2 - 125,align='center')
+    #Sprites for the level menu
     fb = app.fireboy
     fblegs = fb.legSprites['idle'][0]
     fbhead = fb.headSprites['idle'][fb.frame % len(fb.headSprites['idle'])]
@@ -494,18 +621,23 @@ def levels_redrawAll(app):
     drawImage('Images/htp2.png',app.width//2,app.height//2+250,align='center')
     
 def levels_onMousePress(app,mx,my):
+    #buttons to take you to the levels
     if 211 <= my <= 311:
         if 100 <= mx <= 200:
             app.level = 1
+            resetApp(app)
             setActiveScreen('game')
-        if 268 <= mx <= 368:
+        if 268 <= mx <= 368 and 2 in app.completeLvls:
             app.level = 2
+            resetApp(app)
             setActiveScreen('game')
-        if 432 <= mx <= 532:
+        if 432 <= mx <= 532 and 3 in app.completeLvls:
             app.level = 3
+            resetApp(app)
             setActiveScreen('game')
-        if 600 <= mx <= 700:
+        if 600 <= mx <= 700 and 4 in app.completeLvls:
             app.level = 4
+            resetApp(app)
             setActiveScreen('game')
     if 153 <= mx <= 647:
         if 476 <= my <= 552:
