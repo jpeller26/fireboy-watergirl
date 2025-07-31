@@ -526,10 +526,8 @@ def menu_onMousePress(app,mx,my):
     #button pressing logic within menu
     if (app.width-494)//2 <= mx <= (app.width+494)//2:
         if (app.height-59)//2 <= my <= (app.height+59)//2:
-            app.level = app.prevLevel
             setActiveScreen('game')
         elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
-            app.level = app.prevLevel
             resetApp(app)
             setActiveScreen('game')
         elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
