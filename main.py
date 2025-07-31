@@ -17,8 +17,16 @@ def onAppStart(app):
     app.level = 'Start'
     app.prevLevel = 1
     resetApp(app)
-    
+
 def resetApp(app):
+    app.oneSeconds = [f'Images/Times/{i}.png' for i in range(0,10)]
+    app.oneFrame = 0
+    app.tenSeconds = [f'Images/Times/{i}.png' for i in range(0,6)]
+    app.tenFrame = 0
+    app.oneMinutes = [f'Images/Times/{i}.png' for i in range(0,10)]
+    app.minFrame = 0
+    app.tenMinutes = [f'Images/Times/{i}.png' for i in range(0,10)]
+    app.tenMinFrame = 0
     w = app.width
     h = app.height
     app.gamePaused = False
@@ -243,18 +251,38 @@ def game_redrawAll(app):
         drawRect(k.x,k.y,k.width,k.height,fill=k.color)
     drawPolygon(app.width//2 - 165,0,app.width//2 + 165,0,app.width//2 + 108,80,app.width//2 - 108,80,fill=rgb(120,90,30),border='black')
     drawPolygon(app.width//2 - 150,0,app.width//2 + 150,0,app.width//2 + 100,70,app.width//2 - 100,70,fill='black')
-    if checkGameOver(app):
+    if not checkGameOver(app) and not app.levelOver:
+        drawImage(app.oneSeconds[app.oneFrame % 10],460,35,align='center')
+        drawImage(app.tenSeconds[app.tenFrame % 6],420,35,align='center')
+        drawImage('Images/Times/colon.png',app.width//2,35,align='center')
+        drawImage(app.oneMinutes[app.minFrame % 10],350,35,align='center')
+        drawImage(app.tenMinutes[app.tenMinFrame % 10],310,35,align='center')
+    if checkGameOver(app) or app.levelOver:
         drawRect(app.width//2,app.height//2,app.width-100,app.height-200,fill=gradient('darkGrey','grey',start='bottom'),align='center')
-        drawImage('Images/gameOver.png',app.width//2,app.height//2 - 200,align='center')
-        drawImage('Images/restart.png',app.width//2,app.height//2,align='center')
         drawImage('Images/otherLevels.png',app.width//2,app.height//2+90,align='center')
         drawImage('Images/home.png',app.width//2,app.height//2+180,align='center')
-    if app.levelOver:
-        drawRect(app.width//2,app.height//2,app.width-100,app.height-200,fill=gradient('darkGrey','grey',start='bottom'),align='center')
-        drawImage('Images/lvlComplete.png',app.width//2,app.height//2 - 200,align='center')
-        drawImage('Images/nextLevel.png',app.width//2,app.height//2,align='center')
-        drawImage('Images/otherLevels.png',app.width//2,app.height//2+90,align='center')
-        drawImage('Images/home.png',app.width//2,app.height//2+180,align='center')
+        drawImage('Images/time.png',app.width//3,250,align='center')
+        drawImage(app.oneSeconds[app.oneFrame % 10],460+app.width//6,250,align='center')
+        drawImage(app.tenSeconds[app.tenFrame % 6],420+app.width//6,250,align='center')
+        drawImage('Images/Times/colon.png',app.width//2+app.width//6,250,align='center')
+        drawImage(app.oneMinutes[app.minFrame % 10],350+app.width//6,250,align='center')
+        drawImage(app.tenMinutes[app.tenMinFrame % 10],310+app.width//6,250,align='center')
+        drawImage('Images/sprites/blueDiamond.png',app.width//3-40,315,align='center')
+        drawImage('Images/sprites/redDiamond.png',app.width//3,315,align='center')
+        drawImage('Images/sprites/bothDiamond.png',app.width//3+40,315,align='center')
+        if app.score <= 9:
+            drawImage(f'Images/Times/{app.score}.png',2*app.width//3,315,align='center')
+        elif app.score >= 10:
+            firstDigit = app.score%10
+            secondDigit = (app.score//10)%10
+            drawImage(f'Images/Times/{secondDigit}.png',2*app.width//3-20,315,align='center')
+            drawImage(f'Images/Times/{firstDigit}.png',2*app.width//3+20,315,align='center')
+        if checkGameOver:
+            drawImage('Images/gameOver.png',app.width//2,app.height//2 - 215,align='center')
+            drawImage('Images/restart.png',app.width//2,app.height//2,align='center')
+        if app.levelOver:
+            drawImage('Images/lvlComplete.png',app.width//2,app.height//2 - 200,align='center')
+            drawImage('Images/nextLevel.png',app.width//2,app.height//2,align='center')
         
 def game_onMousePress(app,mx,my):
     menuCenter = 40
@@ -317,6 +345,14 @@ def game_onStep(app):
                 index += 1
         app.score = app.fireboy.score + app.watergirl.score
         checkDoors(app)
+        if app.frameCount % 30 == 0:
+            app.oneFrame += 1
+        if app.frameCount % 300 == 0:
+            app.tenFrame += 1
+        if app.frameCount % 1800 == 0:
+            app.minFrame += 1
+        if app.frameCount % 18000 == 0:
+            app.tenMinFrame += 1
             
 def game_onResize(app):
     resetApp(app)
