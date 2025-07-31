@@ -13,12 +13,12 @@ def onAppStart(app):
     app.width = 800
     app.height = 800
     app.base = app.height - 50
-    app.frameCount = 0
     app.level = 'Start'
     app.prevLevel = 1
     resetApp(app)
 
 def resetApp(app):
+    app.frameCount = 0
     app.oneSeconds = [f'Images/Times/{i}.png' for i in range(0,10)]
     app.oneFrame = 0
     app.tenSeconds = [f'Images/Times/{i}.png' for i in range(0,6)]
@@ -459,12 +459,58 @@ def howTo_onMousePress(app,mx,my):
             setActiveScreen('start')
 
 def levels_onScreenActivate(app):
-    app.gamePaused = True
+    app.gamePaused = False
+    
+def levels_onStep(app):
+    app.frameCount += 1
+    for char in app.characters:
+        if app.frameCount % 2 == 0:
+            char.frame += 1
 
 def levels_redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
     drawRect(app.width//2,app.height//2,app.width-100,app.height-100,fill=gradient('darkGrey','grey',start='bottom'),align='center')
     drawImage('Images/levels.png',app.width//2,app.height//2 - 260,align='center')
+    drawRect(app.width//2-300,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30))
+    drawImage('Images/Times/1.png',app.width//2-250,app.height//2 - 125,align='center')
+    drawRect(app.width//2-132,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30))
+    drawImage('Images/Times/2.png',app.width//2-82,app.height//2 - 125,align='center')
+    drawRect(app.width//2+300,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30),align='top-right')
+    drawImage('Images/Times/4.png',app.width//2+250,app.height//2 - 125,align='center')
+    drawRect(app.width//2+132,app.height//2-175,app.width//8,app.width//8,fill=rgb(120,90,30),align='top-right')
+    drawImage('Images/Times/3.png',app.width//2+82,app.height//2 - 125,align='center')
+    fb = app.fireboy
+    fblegs = fb.legSprites['idle'][0]
+    fbhead = fb.headSprites['idle'][fb.frame % len(fb.headSprites['idle'])]
+    drawImage(fblegs,app.width//3,app.height//2+fb.height//2,align='center')
+    drawImage(fbhead,app.width//3,app.height//2,align='center')
+    wg = app.watergirl
+    wglegs = wg.legSprites['idle'][0]
+    wghead = wg.headSprites['idle'][wg.frame % len(wg.headSprites['idle'])]
+    drawImage(wglegs,2*app.width//3,app.height//2+wg.height//2,align='center')
+    drawImage(wghead,2*app.width//3,app.height//2,align='center')
+    drawImage('Images/home.png',app.width//2,app.height//2+app.height//6,align='center')
+    drawImage('Images/htp2.png',app.width//2,app.height//2+250,align='center')
     
-runAppWithScreens(initialScreen='start')
+def levels_onMousePress(app,mx,my):
+    if 211 <= my <= 311:
+        if 100 <= mx <= 200:
+            app.level = 1
+            setActiveScreen('game')
+        if 268 <= mx <= 368:
+            app.level = 2
+            setActiveScreen('game')
+        if 432 <= mx <= 532:
+            app.level = 3
+            setActiveScreen('game')
+        if 600 <= mx <= 700:
+            app.level = 4
+            setActiveScreen('game')
+    if 153 <= mx <= 647:
+        if 476 <= my <= 552:
+            setActiveScreen('start')
+        if 606 <= my <= 666:
+            setActiveScreen('howTo')
+    
+runAppWithScreens(initialScreen='levels')
