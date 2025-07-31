@@ -59,30 +59,32 @@ class Character:
         }
     
     def jump(self):
-        if not self.jumping:
+        if self.onGround:
             self.vy = -(5*self.height//8)
             self.jumping = True
             self.onGround = False
             
     def landOnPlatform(self, platforms, boxes, groundY):
+        self.onGround = False
         if self.y >= groundY:
             self.y = groundY
             self.vy = 0
             self.jumping = False
             self.updateBounds()
             self.onGround = True
-            return 
+            return
         charLeft, charRight = self.x, self.x + self.width
         surfaces = platforms + boxes
         for p in surfaces:
             if charRight > p.left and charLeft < p.right:
-                if type(p) == MovingPlatform and self.prevY <= p.prevTop <= self.y and p.on:
-                    self.y = p.top
-                    self.vy = 0
-                    self.jumping = False
-                    self.updateBounds()
-                    self.onGround = True
-                    break
+                if type(p) == MovingPlatform:
+                    if (self.prevY <= p.prevTop <= self.y) or (self.prevY <= p.top <= self.y):
+                        self.y = p.top
+                        self.vy = 0
+                        self.jumping = False
+                        self.updateBounds()
+                        self.onGround = True
+                        break
                 elif self.prevY <= p.top <= self.y:
                     self.y = p.top
                     self.vy = 0
@@ -153,17 +155,33 @@ class Character:
                 if k.color != self.color:
                     self.gameOver = True
                     
-    def moveBox(self,dir,boxes):
+    def moveBox(self,dir,boxes,platforms,appWidth):
         for b in boxes:
             if (self.right > b.left and self.left < b.right and
-                self.bot == b.bot and self.top <= b.bot and
-                self.onGround):
-                if dir == 1:
-                    b.left = self.right
-                    b.right = self.right + b.sl
-                elif dir == -1:
-                    b.right = self.left
-                    b.left = self.left - b.sl
+                abs(self.bot - b.bot) <= 2 and self.top <= b.bot and
+                self.onGround and not b.left < 0 and not
+                b.right > appWidth):
+                newX = b.left + dir * self.vx
+                newRight = newX + b.sl
+                if newX < 0:
+                    newX = 0
+                    newRight = newX + b.sl
+                elif newRight > appWidth:
+                    newRight = appWidth
+                    newX = newRight - b.sl
+                top = b.y - b.sl
+                bot = b.y
+                for p in platforms:
+                    if top < p.bot and bot > p.top:
+                        if dir > 0 and b.x + b.sl <= p.left and newRight > p.left:
+                            newX = p.left - b.sl
+                            newRight = newX + b.sl
+                        elif dir < 0 and b.x >= p.right and newX < p.right:
+                            newX = p.right
+                            newRight = newX + b.sl
+                
+                b.x = newX
+                b.updateBounds()
                     
     def enterDoor(self,doors):
         for d in doors:
@@ -211,5 +229,5 @@ class Character:
         self.moveLever(levers,dir)
         self.collectDiamond(diamonds)
         self.hitKillPart(killParts)
-        self.moveBox(dir,boxes)
+        self.moveBox(dir,boxes,platforms,appWidth)
         self.enterDoor(doors)

@@ -15,6 +15,7 @@ def onAppStart(app):
     app.base = app.height - 50
     app.frameCount = 0
     app.level = 'Start'
+    app.prevLevel = 1
     resetApp(app)
     
 def resetApp(app):
@@ -30,6 +31,8 @@ def resetApp(app):
     mp12 = MovingPlatform(w-w//5-w//9,app.base-16*brickSpace,app.width,app.height,w-w//5-w//9,app.base-20*brickSpace)
     mp21 = MovingPlatform(0,app.base-brickSpace,w,h,0,app.base-19*brickSpace)
     mp22 = MovingPlatform(w-w//9,app.base-brickSpace,w,h,w-w//9,app.base-19*brickSpace)
+    mp31 = MovingPlatform(0,app.base-5*brickSpace,w,h,0,app.base-14*brickSpace,w//5)
+    mp32 = MovingPlatform(w-w//5,app.base-5*brickSpace,w,h,w-w//5,app.base-14*brickSpace,w//5)
     app.levels = {
         'levelStart' :
             {'characters' : [Character(60,app.base,'orange',app.width,app.height),
@@ -45,7 +48,7 @@ def resetApp(app):
             {'characters': [Character(60,app.base,'orange',app.width,app.height),
                             Character(60,app.base - 4*brickSpace,'lightBlue',app.width,app.height)],
              'platforms': [Platform(0,app.base - 4*brickSpace,w//3,w,h),
-                            Platform(w-w//6,app.base - 4*brickSpace,w//6,w,h,4*brickSpace),
+                            Platform(w-w//6-20,app.base - 4*brickSpace,w//6+20,w,h,4*brickSpace),
                             Platform(w//2.5,app.base - 8*brickSpace,w//3,w,h),
                             Platform(w//2.5,app.base - 10*brickSpace,w//24,w,h,2*brickSpace),
                             Platform(w//9,app.base-11*brickSpace,w//3,w,h),
@@ -71,7 +74,7 @@ def resetApp(app):
             'level2' :{
                 'characters': [Character(7*w//32-w//30,app.base,'orange',app.width,app.height),
                                 Character(24*w//32+w//24,app.base,'lightBlue',app.width,app.height)],
-             'platforms': [Platform(w//2-w//48,app.base-19*brickSpace,w//24,w,h,24*brickSpace),
+             'platforms': [Platform(w//2-w//48,app.base-19*brickSpace,w//24,w,h,19*brickSpace),
                            Platform(7*w//32,app.base-19*brickSpace,w//24,w,h,19*brickSpace),
                            Platform(24*w//32,app.base-19*brickSpace,w//24,w,h,19*brickSpace),
                            mp21,
@@ -103,7 +106,30 @@ def resetApp(app):
                           Diamond('lightBlue',w-w//18,app.base-20*brickSpace,w,h)],
              'killparts': [Killpart(7*w//32+w//24,app.base-3*brickSpace,'lightBlue',w,h,w//9),
                            Killpart(24*w//32-w//9,app.base-3*brickSpace,'orange',w,h,w//9)],
-             'boxes': []}
+             'boxes': []},
+        'level3' : {'characters' : [Character(20,app.base-17*brickSpace,'orange',app.width,app.height),
+                                    Character(app.width-40,app.base-17*brickSpace,'lightBlue',app.width,app.height)],
+                    'platforms': [Platform(0,app.base-17*brickSpace,w//8,w,h),
+                                  Platform(w-w//8,app.base-17*brickSpace,w//8,w,h),
+                                  Platform(w//2-w//6,app.base-15*brickSpace,w//3,w,h),
+                                  mp31,
+                                  mp32],
+                    'buttons' : [Button(mp31,app.base,8*w//9,w,h),
+                                 Button(mp31,app.base-15*brickSpace,w//2 - w//8,w,h),
+                                 Button(mp32,app.base,w//9,w,h),
+                                 Button(mp32,app.base-15*brickSpace,w//2 + w//8,w,h)],
+                    'doors': [Door(w//2+w/48,app.base-15*brickSpace,app.fireboy),
+                              Door(w//2-w//48 - 76,app.base-15*brickSpace,app.watergirl)],
+                    'levers': [],
+                    'diamonds': [Diamond('orange',w//4,app.base-13*brickSpace,w,h),
+                                 Diamond('orange',w//2-w//6,app.base-3*brickSpace,w,h),
+                                 Diamond('orange',w//24,app.base-10*brickSpace,w,h),
+                                 Diamond('lightBlue',3*w//4,app.base-13*brickSpace,w,h),
+                                 Diamond('lightBlue',w//2+w//6,app.base-3*brickSpace,w,h),
+                                 Diamond('lightBlue',23*w//24,app.base-10*brickSpace,w,h)],
+                    'killparts': [Killpart(w//2-w//6,app.base,'green',w,h,w//3)],
+                    'boxes': [Box(w//2-w//6-85,app.base),
+                              Box(w//2+w//6+50,app.base)]}
     }
     app.fireboy.x = app.levels[f'level{app.level}']['characters'][0].x
     app.fireboy.y = app.levels[f'level{app.level}']['characters'][0].y
@@ -124,12 +150,15 @@ def resetApp(app):
         char.resize(app.height,app.base)
         
 def start_onScreenActivate(app):
+    app.level = 'Start'
     resetApp(app)
+    
         
 def start_redrawAll(app):
     drawImage('Images/start.png',-320,0)
     drawImage('Images/title.png',app.width//2,app.height//2 - 100,align='center')
     drawImage('Images/play.png',app.width//2,app.height//2 + 100,align='center')
+    drawImage('Images/htp.png',app.width//2,app.height//2 + 200,align='center')
     for char in app.characters:
         legs = char.legSprites['idle'][0]
         head = char.headSprites['idle'][char.frame % len(char.headSprites['idle'])]
@@ -144,6 +173,8 @@ def start_onMousePress(app,mx,my):
         (app.height + 120)//2<= my <= (app.height + 280)//2):
         app.level = 1
         setActiveScreen('game')
+    if (236 <= mx <= 536 and 553 <= my <= 619):
+        setActiveScreen('howTo')
     
 def start_onStep(app):
     app.frameCount += 1
@@ -239,18 +270,24 @@ def game_onMousePress(app,mx,my):
                 if checkGameOver(app):
                     setActiveScreen('game')
                 else:
-                    app.level += 1
-                    resetApp(app)
+                    if app.level != len(app.levels) - 1:
+                        app.prevLevel = app.level
+                        app.level += 1
+                        resetApp(app)
+                    else:
+                        setActiveScreen('levels')
             elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
                 setActiveScreen('levels')
             elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
+                app.prevLevel = app.level
+                app.level = 'Start'
                 setActiveScreen('start')
 
 def game_onKeyPress(app,key):
     if not checkGameOver(app):
-        if key == 'up' and not app.fireboy.jumping:
+        if key == 'up' and app.fireboy.onGround:
             app.fireboy.jump()
-        if key == 'w' and not app.watergirl.jumping:
+        if key == 'w' and app.fireboy.onGround:
             app.watergirl.jump()
         
 def game_onStep(app):
@@ -334,8 +371,10 @@ def menu_redrawAll(app):
 def menu_onMousePress(app,mx,my):
     if (app.width-494)//2 <= mx <= (app.width+494)//2:
         if (app.height-59)//2 <= my <= (app.height+59)//2:
+            app.level = app.prevLevel
             setActiveScreen('game')
         elif (app.height-59)//2 + 90 <= my <= (app.height+59)//2 + 90:
+            app.level = app.prevLevel
             setActiveScreen('game')
         elif (app.height-59)//2 + 180 <= my <= (app.height+59)//2 + 180:
             setActiveScreen('levels')
@@ -378,6 +417,7 @@ def howTo_redrawAll(app):
 def howTo_onMousePress(app,mx,my):
     if (app.width-494)//2 <= mx <= (app.width+494)//2:
         if 572 <= my <= 630:
+            app.level = app.prevLevel
             setActiveScreen('game')
         if 647 <= my <= 705:
             setActiveScreen('start')
@@ -388,5 +428,7 @@ def levels_onScreenActivate(app):
 def levels_redrawAll(app):
     drawImage('Images/background.png',0,0)
     drawRect(0,0,app.width,app.height,fill=rgb(108,73,4),opacity=40)
+    drawRect(app.width//2,app.height//2,app.width-100,app.height-100,fill=gradient('darkGrey','grey',start='bottom'),align='center')
+    drawImage('Images/levels.png',app.width//2,app.height//2 - 260,align='center')
     
 runAppWithScreens(initialScreen='start')
